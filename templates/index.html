@@ -1,6 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8" />
+    <title>MWALANDILIDWA KU ULIMI WAMAKONO</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; max-width: 800px; }
+        h1 { text-align: center; }
+        #advice-header { text-align: center; font-weight: bold; margin-top: 20px; margin-bottom: 10px; }
+        .output-section { margin-top: 20px; }
+        .output-paragraph { margin-bottom: 10px; }
+        textarea, input[type=text] { width: 100%; padding: 8px; margin-top: 4px; }
+        button { margin-top: 8px; padding: 8px 16px; }
+    </style>
+</head>
+<body>
+
+<h1>MWALANDILIDWA KU ULIMI WAMAKONO</h1>
+<p style="text-align:center;">satilani ndondomeko ya ilimi wamakono</p>
+
+<!-- Crop Search -->
+<div>
+    <label for="cropInput">Search Crops (e.g. maize,cassava)</label><br/>
+    <input type="text" id="cropInput" placeholder="Enter crop names separated by commas" />
+    <button onclick="searchCrops()">Search</button>
+
+    <div id="cropResults" class="output-section"></div>
+</div>
+
+<!-- District Forecast -->
+<div style="margin-top:40px;">
+    <label for="districtInput">Get District Forecast (e.g. karonga)</label><br/>
+    <input type="text" id="districtInput" placeholder="Enter district name" />
+    <button onclick="getForecast()">Get Forecast</button>
+
+    <div id="forecastResults" class="output-section"></div>
+</div>
+
+<!-- Generate Calendar -->
+<div style="margin-top:40px;">
+    <button onclick="generateCalendar()">Generate Crop Calendar</button>
+
+    <div id="calendarResults" class="output-section"></div>
+</div>
+
+<script>
+async function searchCrops() {
+    const input = document.getElementById('cropInput').value;
+    if (!input) return alert("Please enter crop names.");
+    const res = await fetch(`/search/?keywords=${encodeURIComponent(input)}`);
+    const data = await res.json();
+
+    const container = document.getElementById('cropResults');
+    container.innerHTML = "";
+
+    if (data.summary && data.summary.length) {
+        data.summary.forEach(s => {
+            const p = document.createElement("p");
+            p.className = "output-paragraph";
+            p.textContent = s;
+            container.appendChild(p);
+        });
+    } else {
+        container.textContent = "No results found.";
+    }
+}
+
+async function getForecast() {
+    const input = document.getElementById('districtInput').value;
+    if (!input) return alert("Please enter a district name.");
+    const res = await fetch(`/forecast/?district=${encodeURIComponent(input)}`);
+    const data = await res.json();
+
+    const container = document.getElementById('forecastResults');
+    container.innerHTML = "";
+
+    if (data.error) {
+        container.textContent = "Error: " + data.error;
+        return;
+    }
+
+    // Show forecast summary paragraphs split by '. ' for better readability
+    const summaryParagraphs = data.forecast_summary.split('. ').filter(p => p.trim());
+    summaryParagraphs.forEach(text => {
+        const p = document.createElement("p");
+        p.className = "output-paragraph";
+        p.textContent = text.trim() + (text.endsWith('.') ? '' : '.');
+        container.appendChild(p);
+    });
+
+    // Centered Advice header
+    const adviceHeader = document.createElement("div");
+    adviceHeader.id = "advice-header";
+    adviceHeader.textContent = data.advice_header;
+    container.appendChild(adviceHeader);
+
+    // Advice text
+    const adviceText = document.createElement("p");
+    adviceText.className = "output-paragraph";
+    adviceText.textContent = data.advice_text;
+    container.appendChild(adviceText);
+
+    // Farmer action
+    const actionText = document.createElement("p");
+    actionText.className = "output-paragraph";
+    actionText.textContent = data.farmer_action;
+    container.appendChild(actionText);
+}
+
+async function generateCalendar() {
+    const res = await fetch('/calendar/');
+    const data = await res.json();
+
+    const container = document.getElementById('calendarResults');
+    container.innerHTML = "";
+
+    if (data.error) {
+        container.textContent = "Error: " + data.error;
+        return;
+    }
+
+    const msg = document.createElement("p");
+    msg.textContent = data.message;
+    container.appendChild(msg);
+
+    if (data.calendar_preview) {
+        const table = document.createElement("table");
+        table.border = "1";
+        table.style.width = "100%";
+        const headerRow = document.createElement("tr");
+        Object.keys(data.calendar_preview[0]).forEach(key => {
+            const th = document.createElement("th");
+            th.textContent = key;
+            headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
+
+        data.calendar_preview.forEach(row => {
+            const tr = document.createElement("tr");
+            Object.values(row).forEach(val => {
+                const td = document.createElement("td");
+                td.textContent = val;
+                tr.appendChild(td);
+            });
+            table.appendChild(tr);
+        });
+
+        container.appendChild(table);
+
+        // Download link for CSV file
+        const link = document.createElement("a");
+        link.href = data.saved_to;
+        link.download = data.saved_to.split('/').pop();
+        link.textContent = "Download full calendar CSV";
+        link.style.display = "block";
+        link.style.marginTop = "10px";
+        container.appendChild(link);
+    }
+}
+</script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MWALANDILIDWA KU ULIMI WAMAKONO</title>
