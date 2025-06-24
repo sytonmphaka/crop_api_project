@@ -1,4 +1,124 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EcoCrop API 🌿</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      padding: 0;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .results {
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .result-item {
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .download-link {
+      display: inline-block;
+      margin-top: 1rem;
+      background-color: #28a745;
+      color: #fff;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>EcoCrop API 🌱</h1>
+  <p>Search crops, get forecasts, or generate a crop calendar for Malawi.</p>
+
+  <form id="search-form">
+    <label for="keywords">Search Crops (e.g. maize,cassava)</label>
+    <input type="text" id="keywords" placeholder="Enter crop keywords" required>
+    <button type="submit">Search</button>
+  </form>
+
+  <form id="forecast-form">
+    <label for="district">Get Forecast (e.g. karonga)</label>
+    <input type="text" id="district" placeholder="Enter district name" required>
+    <button type="submit">Get Forecast</button>
+  </form>
+
+  <button id="calendar-btn">Generate Crop Calendar</button>
+
+  <div class="results" id="results"></div>
+
+  <script>
+    const resultsDiv = document.getElementById("results");
+
+    document.getElementById("search-form").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const keywords = document.getElementById("keywords").value;
+      const res = await fetch(`/search/?keywords=${keywords}`);
+      const data = await res.json();
+
+      resultsDiv.innerHTML = `<h2>Crop Search Results</h2>`;
+      data.summary.forEach(item => {
+        resultsDiv.innerHTML += `<div class="result-item">${item}</div>`;
+      });
+
+      if (data.note.includes("saved")) {
+        resultsDiv.innerHTML += `<a class="download-link" href="/results/searched_crops_summary.csv" download>Download Summary CSV</a>`;
+      }
+    });
+
+    document.getElementById("forecast-form").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const district = document.getElementById("district").value;
+      const res = await fetch(`/forecast/?district=${district}`);
+      const data = await res.json();
+
+      resultsDiv.innerHTML = `<h2>Forecast Result</h2><div class="result-item">${data.forecast_summary || data.error}</div>`;
+    });
+
+    document.getElementById("calendar-btn").addEventListener("click", async function() {
+      const res = await fetch(`/calendar/`);
+      const data = await res.json();
+
+      if (data.error) {
+        resultsDiv.innerHTML = `<div class="result-item">Error: ${data.error}</div>`;
+      } else {
+        resultsDiv.innerHTML = `<h2>Calendar Generated</h2>
+        <div class="result-item">${data.message}</div>
+        <a class="download-link" href="${data.saved_to.replace('./', '/')}" download>Download Calendar CSV</a>`;
+      }
+    });
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
 <html>
 <head>
   <title>EcoCrop Interface</title>
