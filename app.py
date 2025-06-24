@@ -43,25 +43,16 @@ def search_crops(keywords: str = Query(..., description="Comma-separated crop na
     return {
         "searched_crops": crop_list,
         "summary": summaries,
-        "note": "Summaries generated from EcoCrop database."
+        "note": "Results saved in 'results/searched_crops_summary.csv'" if all_matches else "No crop results saved."
     }
 
 @app.get("/forecast/")
 def get_district_forecast(district: str = Query(..., description="Enter a Malawi district name, e.g. karonga, mzimba")):
     try:
-        # Fetch raw forecast (loads PDF text)
-        _ = processor.fetch_district_forecast_text(district)
-
-        # Generate human-readable calendar summary and advice
-        readable_data = processor.generate_readable_calendar_advice()
-
-        # Return plain strings (no nested dict) for easy frontend handling
+        forecast = processor.fetch_district_forecast_text(district)
         return {
             "district": district.title(),
-            "forecast_summary": readable_data["summary"],
-            "advice_header": readable_data["advice_header"],
-            "advice_text": readable_data["advice_text"],
-            "farmer_action": readable_data["farmer_action"]
+            "forecast_summary": forecast
         }
     except Exception as e:
         return {
@@ -72,15 +63,16 @@ def get_district_forecast(district: str = Query(..., description="Enter a Malawi
 @app.get("/calendar/")
 def generate_calendar():
     try:
-        df = processor.generate_crop_calendar()
-        calendar_preview = df.head(6).to_dict(orient='records')
-        saved_to = os.path.join('results', f"{processor.selected_crop_data['COMNAME']}_calendar.csv")
+        calendar_df = processor.generate_crop_calendar()
+        output_dir = os.path.join(os.path.dirname(__file__), 'results')
+        os.makedirs(output_dir, exist_ok=True)
+        filename = f"{processor.selected_crop_data['COMNAME'].lower()}_calendar.csv"
+        output_path = os.path.join(output_dir, filename)
+        calendar_df.to_csv(output_path, index=False)
         return {
-            "message": f"Calendar generated for {processor.selected_crop_data['COMNAME']}.",
-            "calendar_preview": calendar_preview,
-            "saved_to": "/" + saved_to.replace("\\", "/")
+            "message": f"Calendar for {processor.selected_crop_data['COMNAME'].title()} in {processor.selected_district_forecast['district'].title()} has been generated.",
+            "calendar_preview": calendar_df.head(12).to_dict(orient="records"),
+            "saved_to": f"/results/{filename}"
         }
     except Exception as e:
-        return {
-            "error": str(e)
-        }
+        return {"error": str(e)}  
