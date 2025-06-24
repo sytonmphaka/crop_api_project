@@ -1,19 +1,20 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 from ecocrop.processor import EcoCropProcessor
 import os
 import pandas as pd
 
-# FastAPI app code
-
 app = FastAPI()
+templates = Jinja2Templates(directory="templates")
 
 # Path to EcoCrop CSV (adjust as needed)
 data_path = os.path.join(os.path.dirname(__file__), 'data', 'EcoCrop_DB.csv')
 processor = EcoCropProcessor(data_path)
 
-@app.get("/")
-def welcome():
-    return {"message": "EcoCrop API is live"}
+@app.get("/", response_class=HTMLResponse)
+def welcome(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/search/")
 def search_crops(keywords: str = Query(..., description="Comma-separated crop names, e.g. maize,cassava,sorghum")):
