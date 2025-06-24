@@ -187,41 +187,41 @@ class EcoCropProcessor:
         }
 
     def generate_crop_calendar(self):
-    if not self.selected_crop_data or not self.selected_district_forecast:
-        raise ValueError("Both crop and district forecast data must be selected first. Please run search_crops() and fetch_district_forecast_text() first.")
+        if not self.selected_crop_data or not self.selected_district_forecast:
+            raise ValueError("Both crop and district forecast data must be selected first.")
 
-    crop = self.selected_crop_data
-    forecast = self.selected_district_forecast['monthly_forecast']
+        crop = self.selected_crop_data
+        forecast = self.selected_district_forecast['monthly_forecast']
 
-    gmin = int(crop.get("GMIN", 0))
-    gmax = int(crop.get("GMAX", 0))
-    growth_duration = round((gmin + gmax) / 2)
+        gmin = int(crop.get("GMIN", 0))
+        gmax = int(crop.get("GMAX", 0))
+        growth_duration = round((gmin + gmax) / 2)
 
-    onset_month = "December 2024"  # You can make this dynamic if you want later
-    start_date = datetime.strptime("01 " + onset_month, "%d %B %Y")
-    end_date = start_date + pd.Timedelta(days=growth_duration)
+        onset_month = "December 2024"
+        start_date = datetime.strptime("01 " + onset_month, "%d %B %Y")
+        end_date = start_date + pd.Timedelta(days=growth_duration)
 
-    calendar_data = []
-    current = start_date
+        calendar_data = []
+        current = start_date
 
-    while current <= end_date:
-        month_key = f"{calendar.month_name[current.month]} {current.year}"
-        text = forecast.get(month_key, "")
-        rain_match = re.findall(r"(\d{2,4})\s*mm", text)
-        rain_avg = sum([int(r) for r in rain_match]) // len(rain_match) if rain_match else 0
-        irrigation = "Yes" if rain_avg < (int(crop.get("ROPMN", 0)) // 3) else "No"
+        while current <= end_date:
+            month_key = f"{calendar.month_name[current.month]} {current.year}"
+            text = forecast.get(month_key, "")
+            rain_match = re.findall(r"(\d{2,4})\s*mm", text)
+            rain_avg = sum([int(r) for r in rain_match]) // len(rain_match) if rain_match else 0
+            irrigation = "Yes" if rain_avg < (int(crop.get("ROPMN", 0)) // 3) else "No"
 
-        calendar_data.append({
-            "Month": month_key,
-            "Expected Rainfall (mm)": rain_avg,
-            "Dry Spell Detected": rain_avg < 50,
-            "Irrigation Needed": irrigation,
-            "Recommended Action": "Irrigate weekly" if irrigation == "Yes" else "Rainfed OK",
-            "Activity": "Growth phase"
-        })
-        current += pd.DateOffset(months=1)
+            calendar_data.append({
+                "Month": month_key,
+                "Expected Rainfall (mm)": rain_avg,
+                "Dry Spell Detected": rain_avg < 50,
+                "Irrigation Needed": irrigation,
+                "Recommended Action": "Irrigate weekly" if irrigation == "Yes" else "Rainfed OK",
+                "Activity": "Growth phase"
+            })
+            current += pd.DateOffset(months=1)
 
-    df = pd.DataFrame(calendar_data)
-    output_path = os.path.join(os.path.dirname(__file__), '..', 'results', f"{crop['COMNAME']}_calendar.csv")
-    df.to_csv(output_path, index=False)
-    return df
+        df = pd.DataFrame(calendar_data)
+        output_path = os.path.join(os.path.dirname(__file__), '..', 'results', f"{crop['COMNAME']}_calendar.csv")
+        df.to_csv(output_path, index=False)
+        return df
