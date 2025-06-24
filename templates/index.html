@@ -11,6 +11,7 @@
     max-width: 900px;
     margin-left: auto;
     margin-right: auto;
+    text-align: center;  /* Center all text inside body */
   }
   h1 {
     color: #2e7d32;
@@ -25,6 +26,10 @@
   }
   form {
     margin-bottom: 30px;
+    display: inline-block;
+    text-align: left;
+    max-width: 400px;
+    width: 100%;
   }
   label {
     font-weight: bold;
@@ -46,6 +51,8 @@
     cursor: pointer;
     font-size: 1em;
     border-radius: 4px;
+    display: block;
+    margin: 0 auto;
   }
   button:hover {
     background-color: #2e7d32;
@@ -57,6 +64,10 @@
     margin-top: 10px;
     white-space: pre-wrap;
     word-wrap: break-word;
+    text-align: left; /* paragraphs aligned left for readability */
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
   }
   .output p {
     margin: 0 0 15px 0;
@@ -75,7 +86,7 @@
 </head>
 <body>
   <h1>MWALANDILIDWA KU ULIMI WAMAKONO</h1>
-  <p class="subtitle">Satilani ndondomeko m'mutsimu</p>
+  <p class="subtitle">Satilani ndondomeko ya ilimi wamakono</p>
 
   <!-- Crop Search -->
   <section id="crop-search-section">
@@ -89,7 +100,7 @@
   </section>
 
   <!-- District Forecast -->
-  <section id="forecast-section">
+  <section id="forecast-section" style="margin-top: 40px;">
     <form id="forecast-form">
       <label for="district-name">Get District Forecast (e.g. karonga)</label>
       <input type="text" id="district-name" name="district" required />
@@ -99,7 +110,7 @@
   </section>
 
   <!-- Crop Calendar -->
-  <section id="calendar-section">
+  <section id="calendar-section" style="margin-top: 40px;">
     <button id="generate-calendar-btn">Generate Crop Calendar</button>
     <div id="calendar-results" class="output"></div>
     <a id="calendar-download-link" href="#" class="download-link" style="display:none;" target="_blank" download>Download Calendar CSV</a>
@@ -155,8 +166,22 @@
       if(data.error) {
         resultsDiv.innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
       } else if(data.forecast_summary) {
-        const paragraphs = data.forecast_summary.split('\n').filter(p => p.trim() !== '');
-        resultsDiv.innerHTML = formatParagraphs(paragraphs);
+        // data.forecast_summary is an object with monthly_forecast & seasonal_summary
+        const mf = data.forecast_summary.monthly_forecast;
+        const ss = data.forecast_summary.seasonal_summary;
+
+        // Build html for monthly forecast
+        let monthlyHtml = '<h3>Monthly Forecast</h3><ul>';
+        for (const month in mf) {
+          monthlyHtml += `<li><strong>${month}:</strong> ${mf[month]}</li>`;
+        }
+        monthlyHtml += '</ul>';
+
+        // Build html for seasonal summary paragraphs
+        let seasonalHtml = '<h3>Seasonal Summary</h3>';
+        seasonalHtml += formatParagraphs(ss);
+
+        resultsDiv.innerHTML = monthlyHtml + seasonalHtml;
       } else {
         resultsDiv.innerHTML = '<p>No forecast available.</p>';
       }
