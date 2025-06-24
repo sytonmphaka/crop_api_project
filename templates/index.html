@@ -1,6 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <title>EcoCrop Interface</title>
+</head>
+<body>
+  <h1>EcoCrop API 🌿</h1>
+
+  <h3>Search for Crops</h3>
+  <input type="text" id="cropInput" placeholder="e.g. maize, cassava">
+  <button onclick="searchCrops()">Search</button>
+  <pre id="searchResult"></pre>
+
+  <h3>Get District Forecast</h3>
+  <input type="text" id="districtInput" placeholder="e.g. karonga">
+  <button onclick="getForecast()">Get Forecast</button>
+  <pre id="forecastResult"></pre>
+
+  <script>
+    async function searchCrops() {
+      const crops = document.getElementById("cropInput").value;
+      const res = await fetch(`/search/?keywords=${encodeURIComponent(crops)}`);
+      const data = await res.json();
+      document.getElementById("searchResult").textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function getForecast() {
+      const district = document.getElementById("districtInput").value;
+      const res = await fetch(`/forecast/?district=${encodeURIComponent(district)}`);
+      const data = await res.json();
+      document.getElementById("forecastResult").textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
   <title>EcoCrop API</title>
   <style>
     body {
