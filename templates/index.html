@@ -1,6 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MWALANDILIDWA KU ULIMI WAMAKONO</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  h1 {
+    color: #2e7d32;
+    text-align: center;
+  }
+  p.subtitle {
+    text-align: center;
+    font-style: italic;
+    margin-top: 0;
+    margin-bottom: 40px;
+    color: #555;
+  }
+  form {
+    margin-bottom: 30px;
+  }
+  label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+  }
+  button {
+    padding: 10px 20px;
+    background-color: #388e3c;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    border-radius: 4px;
+  }
+  button:hover {
+    background-color: #2e7d32;
+  }
+  .output {
+    background: #f0f4f1;
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 10px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  .output p {
+    margin: 0 0 15px 0;
+  }
+  .download-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: #2e7d32;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  .download-link:hover {
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+  <h1>MWALANDILIDWA KU ULIMI WAMAKONO</h1>
+  <p class="subtitle">Sdatilani ndondomeko m'mutsimu</p>
+
+  <!-- Crop Search -->
+  <section id="crop-search-section">
+    <form id="crop-search-form">
+      <label for="crop-keywords">Search Crops (e.g. maize,cassava)</label>
+      <input type="text" id="crop-keywords" name="keywords" required />
+      <button type="submit">Search</button>
+    </form>
+    <div id="crop-search-results" class="output"></div>
+    <a id="crop-download-link" href="#" class="download-link" style="display:none;" target="_blank" download>Download Crop Summary CSV</a>
+  </section>
+
+  <!-- District Forecast -->
+  <section id="forecast-section">
+    <form id="forecast-form">
+      <label for="district-name">Get District Forecast (e.g. karonga)</label>
+      <input type="text" id="district-name" name="district" required />
+      <button type="submit">Get Forecast</button>
+    </form>
+    <div id="forecast-results" class="output"></div>
+  </section>
+
+  <!-- Crop Calendar -->
+  <section id="calendar-section">
+    <button id="generate-calendar-btn">Generate Crop Calendar</button>
+    <div id="calendar-results" class="output"></div>
+    <a id="calendar-download-link" href="#" class="download-link" style="display:none;" target="_blank" download>Download Calendar CSV</a>
+  </section>
+
+<script>
+  // Helper to format array of paragraphs nicely
+  function formatParagraphs(textArray) {
+    return textArray.map(p => `<p>${p}</p>`).join('');
+  }
+
+  // Crop Search
+  document.getElementById('crop-search-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const keywords = document.getElementById('crop-keywords').value.trim();
+    if (!keywords) return;
+
+    const resultsDiv = document.getElementById('crop-search-results');
+    const downloadLink = document.getElementById('crop-download-link');
+    resultsDiv.innerHTML = 'Loading...';
+    downloadLink.style.display = 'none';
+
+    try {
+      const response = await fetch(`/search/?keywords=${encodeURIComponent(keywords)}`);
+      const data = await response.json();
+
+      if(data.summary && data.summary.length) {
+        // Format each summary as a paragraph block
+        const formatted = data.summary.map(s => `<p>${s}</p>`).join('');
+        resultsDiv.innerHTML = formatted;
+
+        // Show download link if available
+        if(data.note && data.note.includes('Results saved')) {
+          downloadLink.href = '/results/searched_crops_summary.csv';
+          downloadLink.style.display = 'inline-block';
+        }
+      } else {
+        resultsDiv.innerHTML = `<p>No results found for: ${keywords}</p>`;
+      }
+    } catch(err) {
+      resultsDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+    }
+  });
+
+  // District Forecast
+  document.getElementById('forecast-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const district = document.getElementById('district-name').value.trim();
+    if (!district) return;
+
+    const resultsDiv = document.getElementById('forecast-results');
+    resultsDiv.innerHTML = 'Loading...';
+
+    try {
+      const response = await fetch(`/forecast/?district=${encodeURIComponent(district)}`);
+      const data = await response.json();
+
+      if(data.error) {
+        resultsDiv.innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
+      } else if(data.forecast_summary) {
+        // Break forecast into paragraphs if long
+        const paragraphs = data.forecast_summary.split('\n').filter(p => p.trim() !== '');
+        resultsDiv.innerHTML = formatParagraphs(paragraphs);
+      } else {
+        resultsDiv.innerHTML = '<p>No forecast available.</p>';
+      }
+    } catch(err) {
+      resultsDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+    }
+  });
+
+  // Generate Calendar
+  document.getElementById('generate-calendar-btn').addEventListener('click', async function() {
+    const resultsDiv = document.getElementById('calendar-results');
+    const downloadLink = document.getElementById('calendar-download-link');
+    resultsDiv.innerHTML = 'Generating calendar...';
+    downloadLink.style.display = 'none';
+
+    try {
+      const response = await fetch('/calendar/');
+      const data = await response.json();
+
+      if(data.error) {
+        resultsDiv.innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
+      } else {
+        // Show message and preview
+        let html = `<p>${data.message}</p>`;
+        if(data.calendar_preview && data.calendar_preview.length > 0) {
+          data.calendar_preview.forEach(row => {
+            html += '<p>' + Object.entries(row).map(([k,v]) => `${k}: ${v}`).join(', ') + '</p>';
+          });
+        }
+        resultsDiv.innerHTML = html;
+
+        if(data.saved_to) {
+          downloadLink.href = data.saved_to;
+          downloadLink.style.display = 'inline-block';
+        }
+      }
+    } catch(err) {
+      resultsDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+    }
+  });
+</script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8" />
     <title>MWALANDILIDWA KU ULIMI WAMAKONO</title>
     <style>
