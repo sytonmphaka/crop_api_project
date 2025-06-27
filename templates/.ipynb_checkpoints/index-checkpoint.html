@@ -347,6 +347,9 @@
 
 
     /* ========== PLANT INFO SEARCH ========== */
+
+
+      
     document.getElementById('plant-info-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       const query = document.getElementById('plant-query').value.trim();
@@ -359,24 +362,31 @@
 
       try {
         const response = await fetch(`/search/plants/?q=${encodeURIComponent(query)}`);
-        const data = await response.json();
+const contentType = response.headers.get('content-type');
 
-        if (data.results && Array.isArray(data.results) && data.results.length > 0) {
-          // Remove duplicates
-          const uniqueResults = [...new Set(data.results)];
-          // Display results in paragraphs
-          const formatted = uniqueResults.map(item => `<p>${item}</p>`).join('');
-          resultsDiv.innerHTML = formatted;
+if (!response.ok) {
+  const text = await response.text();
+  throw new Error(`Server Error: ${text}`);
+}
 
-          // Show download link with proper query param to get CSV
-          downloadLink.href = `/search/plants/?q=${encodeURIComponent(query)}&download=true`;
-          downloadLink.style.display = 'inline-block';
-        } else {
-          resultsDiv.innerHTML = `<p>No results found for "${query}".</p>`;
-        }
-      } catch (err) {
-        resultsDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-      }
+if (contentType && contentType.includes('application/json')) {
+  const data = await response.json();
+
+  if (data.results && Array.isArray(data.results) && data.results.length > 0) {
+    const uniqueResults = [...new Set(data.results)];
+    const formatted = uniqueResults.map(item => `<p>${item}</p>`).join('');
+    resultsDiv.innerHTML = formatted;
+
+    downloadLink.href = `/search/plants/?q=${encodeURIComponent(query)}&download=true`;
+    downloadLink.style.display = 'inline-block';
+  } else {
+    resultsDiv.innerHTML = `<p>No results found for "${query}".</p>`;
+  }
+} else {
+  const text = await response.text();
+  throw new Error(`Unexpected content type: ${contentType}\nResponse: ${text}`);
+}
+
     });
   </script>
 
