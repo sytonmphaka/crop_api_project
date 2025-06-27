@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pandas
+httpx
+python-multipart
+jinja2
+pdfplumber
+python-docx
+supabase
