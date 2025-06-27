@@ -1,3 +1,120 @@
+from supabase import create_client
+import traceback
+
+SUPABASE_URL = "https://bqolqgyjlankyxbkxsxb.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxb2xxZ3lqbGFua3l4Ymt4c3hiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDkyNjIyNCwiZXhwIjoyMDY2NTAyMjI0fQ.2oNrmnQxdvKUJ72sRnHJ0wmC1mDtyVjTVkmCNv4D2HU"
+BUCKET = "pdfs"
+
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+
+
+
+
+def upload_file_to_supabase(file_obj, filename, title):
+    try:
+        # Read the file as bytes
+        file_bytes = file_obj.read()
+
+        # Upload file to Supabase bucket
+        response = supabase.storage.from_(BUCKET).upload(filename, file_bytes)
+
+        if hasattr(response, "error") and response.error:
+            return {"status": "error", "message": response.error.message}
+
+        # Get the public URL (directly a string, not a dict)
+        public_url = supabase.storage.from_(BUCKET).get_public_url(filename)
+
+        if not isinstance(public_url, str) or not public_url.strip():
+            return {"status": "error", "message": "Failed to get valid public URL"}
+
+        # Insert metadata into 'documents' table
+        data = {"title": title, "file_url": public_url}
+        result = supabase.table("documents").insert(data).execute()
+
+        if hasattr(result, "error") and result.error:
+            return {"status": "error", "message": str(result.error)}
+
+        return {"status": "success", "url": public_url, "result": result.data}
+
+    except Exception as e:
+        traceback.print_exc()
+        return {"status": "error", "message": str(e)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+def fetch_documents():
+    try:
+        response = supabase.table("documents").select("*").order("created_at", desc=True).execute()
+
+        if hasattr(response, "error") and response.error:
+            return []
+
+        return getattr(response, "data", response) or []
+
+    except Exception as e:
+        print("Exception fetching documents:", e)
+        return []
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def delete_file_from_supabase(filename, doc_id):
+    try:
+        # Delete the file from storage
+        storage_response = supabase.storage.from_(BUCKET).remove([filename])
+
+        if hasattr(storage_response, "error") and storage_response.error:
+            return {"status": "error", "message": storage_response.error.message}
+
+        # Delete the record from the documents table
+        db_response = supabase.table("documents").delete().eq("id", doc_id).execute()
+
+        if hasattr(db_response, "error") and db_response.error:
+            return {"status": "error", "message": db_response.error.message}
+
+        return {"status": "success", "message": "File and metadata deleted."}
+
+    except Exception as e:
+        traceback.print_exc()
+        return {"status": "error", "message": str(e)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import pandas as pd
 import os
 import numpy as np
@@ -5,6 +122,10 @@ import re
 import pdfplumber
 from datetime import datetime
 import calendar
+
+# -----------------------------
+# ECOCROPPROCESSOR CLASS EXACTLY AS PROVIDED
+# -----------------------------
 
 class EcoCropProcessor:
     def __init__(self, path):
@@ -225,3 +346,144 @@ class EcoCropProcessor:
         output_path = os.path.join(os.path.dirname(__file__), '..', 'results', f"{crop['COMNAME']}_calendar.csv")
         df.to_csv(output_path, index=False)
         return df
+
+
+# -------------------------------
+# FASTAPI HANDLER SECTION
+# -------------------------------
+
+from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi import UploadFile, HTTPException
+from typing import Optional, List
+
+BASE_DIR = os.path.dirname(__file__)
+UPLOAD_DIR = os.path.join(BASE_DIR, '..', 'uploads')
+DATASET_PATH = os.path.join(BASE_DIR, '..', 'data', 'Crop_dataset.csv')
+
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+try:
+    crop_df = pd.read_csv(DATASET_PATH)
+except Exception as e:
+    crop_df = pd.DataFrame()
+    print(f"[Warning] Could not load dataset: {e}")
+
+
+async def handle_advice_form(
+    files: Optional[List[UploadFile]] = None,
+    soil_ph: Optional[float] = None,
+    moisture: Optional[float] = None,
+    district: Optional[str] = None,
+    indigenous_knowledge: Optional[str] = None
+) -> JSONResponse:
+    saved_files = []
+    if files:
+        for file in files:
+            if not file.filename:
+                continue
+            file_path = os.path.join(UPLOAD_DIR, file.filename)
+            with open(file_path, "wb") as f:
+                f.write(await file.read())
+            saved_files.append(file.filename)
+
+    summary_parts = [
+        f"Soil pH: {soil_ph}" if soil_ph is not None else None,
+        f"Soil Moisture: {moisture}%" if moisture is not None else None,
+        f"District: {district}" if district else None,
+        f"Local Knowledge: {indigenous_knowledge}" if indigenous_knowledge else None,
+        f"Uploaded {len(saved_files)} file(s)" if saved_files else "No files uploaded"
+    ]
+    summary = " | ".join(filter(None, summary_parts))
+
+    recommended_crops = []
+    if not crop_df.empty:
+        filtered = crop_df.copy()
+
+        if soil_ph is not None:
+            soil_ph_whole = int(soil_ph)
+            filtered['ph_whole'] = crop_df['ph'].fillna(0).astype(float).astype(int)
+            filtered = filtered[filtered['ph_whole'] == soil_ph_whole]
+
+        if moisture is not None:
+            moisture_whole = int(moisture)
+            filtered['humidity_whole'] = crop_df['humidity'].fillna(0).astype(float).astype(int)
+            filtered = filtered[filtered['humidity_whole'] == moisture_whole]
+
+        recommended_crops = filtered['label'].dropna().unique().tolist()
+
+    return JSONResponse(content={
+        "summary": summary,
+        "uploaded_files": saved_files,
+        "recommended_crops": recommended_crops or ["No crop matched the input"]
+    })
+
+
+def read_uploaded_file(filename: str) -> PlainTextResponse:
+    file_path = os.path.join(UPLOAD_DIR, filename)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="File not found")
+
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+    except UnicodeDecodeError:
+        return PlainTextResponse("Cannot display this file (possibly binary or non-text format)", status_code=400)
+
+    return PlainTextResponse(content)
+def search_plants(search_term: str, limit=10):
+    file_path = '/Users/patrickkawayechimseu/crop_api_project/data/pfaf_plants_merged.csv'
+    
+    search_columns = [
+        'use_keywords', 'latin_name_search', 'common_name_search',
+        'Scientific Name', 'Common Name'
+    ]
+    
+    summary_columns = [
+        'use_keywords', 'latin_name_search', 'edibility_rating_search',
+        'medicinal_rating_search', 'plant_url', 'Care Requirements', 'Common Name',
+        'Cultivation Details', 'Edibility Rating', 'Edible Uses', 'Family', 'Known Hazards',
+        'Medicinal Properties', 'Medicinal Rating', 'Native Range', 'Other Uses',
+        'Other Uses Rating', 'Propagation', 'Range', 'Scientific Name', 'Special Uses',
+        'Summary', 'USDA hardiness', 'Weed Potential'
+    ]
+    
+    df = pd.read_csv(file_path)
+    
+    mask = False
+    for col in search_columns:
+        if col in df.columns:
+            mask = mask | df[col].astype(str).str.contains(search_term, case=False, na=False)
+    
+    matched = df[mask]
+
+    # Drop exact duplicates of Common + Latin Name
+    matched = matched.drop_duplicates(subset=["Common Name", "Scientific Name"])
+
+    # Limit to first N results
+    matched = matched.head(limit)
+
+    results = []
+    
+    for _, row in matched.iterrows():
+        para = f"{row.get('Common Name', 'Unknown Plant')} ({row.get('latin_name_search', row.get('Scientific Name', ''))}) "
+        para += f"is traditionally used for {row.get('use_keywords', 'various uses')}. "
+        edibility = row.get('edibility_rating_search', row.get('Edibility Rating', 'N/A'))
+        medicinal = row.get('medicinal_rating_search', row.get('Medicinal Rating', 'N/A'))
+        para += f"It has an edibility rating of {edibility} and a medicinal rating of {medicinal}.\n\n"
+        para += f"The plant prefers: {row.get('Care Requirements', 'Care details not available.')}\n\n"
+        para += f"Cultivation details: {row.get('Cultivation Details', 'No cultivation details provided.')}\n\n"
+        para += f"Edible uses: {row.get('Edible Uses', 'No edible uses recorded.')}\n\n"
+        para += f"Known hazards: {row.get('Known Hazards', 'No known hazards.')}\n\n"
+        para += f"Medicinal properties include: {row.get('Medicinal Properties', 'Medicinal properties not specified.')}\n\n"
+        para += f"Native range: {row.get('Native Range', 'Native range not recorded.')}\n\n"
+        para += f"Other uses: {row.get('Other Uses', 'No other uses specified.')}\n\n"
+        summary_text = row.get('Summary', '')
+        if summary_text:
+            para += f"Summary: {summary_text}\n\n"
+        para += f"👉 🔗 [View Full Details and Images]({row.get('plant_url', '#')})"
+        results.append(para)
+    
+    return results
+
+
+

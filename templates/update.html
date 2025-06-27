@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🔄 Updates</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f9f9f9;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    h3 {
+      color: #2c3e50;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin: 10px 0;
+    }
+    a {
+      text-decoration: none;
+      color: #2c3e50;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h3>🔄 Updates</h3>
+
+    {% if updates %}
+      <ul>
+        {% for file in updates %}
+          <li>
+            <strong>{{ file.title }}</strong> — {{ file.filename }}
+            <br>
+            <a href="/view?url={{ file.file_url }}" target="_blank">👁 View</a> |
+            <a href="/download?url={{ file.file_url }}">⬇ Download</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No updated files found.</p>
+    {% endif %}
+  </div>
+
+</body>
+</html>

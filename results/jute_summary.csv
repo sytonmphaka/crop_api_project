@@ -1,0 +1,2 @@
+COMNAME,LISPA,TOPMN,TOPMX,TMIN,TMAX,ROPMN,ROPMX,RMIN,RMAX,PHOPMN,PHOPMX,PHMIN,PHMAX,ALTMX,LIOPMN,LIOPMX,LIMN,LIMX,DEP,DEPR,TEXT,TEXTR,FER,FERR,SAL,SALR,DRA,DRAR,CLIZ,GMIN,GMAX
+jute,annual,20.0,37.0,13.0,45.0,1500.0,3000.0,900.0,3600.0,6.5,7.0,5.0,8.6,2000.0,very bright,clear skies,very bright,cloudy skies,medium (50-150 cm),shallow (20-50 cm),"heavy, medium","heavy, medium, light",high,high,low (<4 dS/m),low (<4 dS/m),well (dry spells),"poorly (saturated >50% of year), well (dry spells)","tropical wet & dry (Aw), subtropical dry summer (Cs)",80.0,150.0
