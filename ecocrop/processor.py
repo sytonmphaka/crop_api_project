@@ -11,6 +11,8 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 
+
+
 def upload_file_to_supabase(file_obj, filename, title):
     try:
         # Read the file as bytes
@@ -348,6 +350,18 @@ class EcoCropProcessor:
         return df
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 # -------------------------------
 # FASTAPI HANDLER SECTION
 # -------------------------------
@@ -430,40 +444,43 @@ def read_uploaded_file(filename: str) -> PlainTextResponse:
         return PlainTextResponse("Cannot display this file (possibly binary or non-text format)", status_code=400)
 
     return PlainTextResponse(content)
+
+
+
+
+
+
+
 def search_plants(search_term: str, limit=10):
-    file_path = '/Users/patrickkawayechimseu/crop_api_project/data/pfaf_plants_merged.csv'
-    
+    import pandas as pd
+    import os
+
+    BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    CSV_PATH = os.path.join(BASE_DIR, 'data', 'pfaf_plants_merged.csv')
+
+
+    try:
+        df = pd.read_csv(CSV_PATH)
+    except Exception as e:
+        print(f"[Error] Could not load pfaf_plants_merged.csv: {e}")
+        return [f"Error loading plant database: {e}"]
+
     search_columns = [
         'use_keywords', 'latin_name_search', 'common_name_search',
         'Scientific Name', 'Common Name'
     ]
-    
-    summary_columns = [
-        'use_keywords', 'latin_name_search', 'edibility_rating_search',
-        'medicinal_rating_search', 'plant_url', 'Care Requirements', 'Common Name',
-        'Cultivation Details', 'Edibility Rating', 'Edible Uses', 'Family', 'Known Hazards',
-        'Medicinal Properties', 'Medicinal Rating', 'Native Range', 'Other Uses',
-        'Other Uses Rating', 'Propagation', 'Range', 'Scientific Name', 'Special Uses',
-        'Summary', 'USDA hardiness', 'Weed Potential'
-    ]
-    
-    df = pd.read_csv(file_path)
-    
+
     mask = False
     for col in search_columns:
         if col in df.columns:
             mask = mask | df[col].astype(str).str.contains(search_term, case=False, na=False)
-    
+
     matched = df[mask]
 
-    # Drop exact duplicates of Common + Latin Name
     matched = matched.drop_duplicates(subset=["Common Name", "Scientific Name"])
-
-    # Limit to first N results
     matched = matched.head(limit)
 
     results = []
-    
     for _, row in matched.iterrows():
         para = f"{row.get('Common Name', 'Unknown Plant')} ({row.get('latin_name_search', row.get('Scientific Name', ''))}) "
         para += f"is traditionally used for {row.get('use_keywords', 'various uses')}. "
@@ -482,8 +499,5 @@ def search_plants(search_term: str, limit=10):
             para += f"Summary: {summary_text}\n\n"
         para += f"👉 🔗 [View Full Details and Images]({row.get('plant_url', '#')})"
         results.append(para)
-    
+
     return results
-
-
-

@@ -1,28 +1,16 @@
-from fastapi import FastAPI, Query, Request, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, Query, Request, UploadFile, File, Form, HTTPException, Response, APIRouter
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, PlainTextResponse, JSONResponse, FileResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, JSONResponse, FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from ecocrop.processor import EcoCropProcessor, handle_advice_form, read_uploaded_file, search_plants
 from typing import Optional, List
 import os
 import pandas as pd
-from fastapi import FastAPI, Request, Form, UploadFile, File
-from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+import io
 
-
-
-
-#app = FastAPI()
-
-
-
-from fastapi import APIRouter
 router = APIRouter()
-
 templates = Jinja2Templates(directory="templates")
-
 
 # Path to EcoCrop CSV (adjust as needed)
 data_path = os.path.join(os.path.dirname(__file__), 'data', 'EcoCrop_DB.csv')
@@ -94,6 +82,11 @@ def generate_calendar():
         return {"error": str(e)}
 
 
+
+
+
+
+
 @router.post("/advise/")
 async def advise_endpoint(
     files: Optional[List[UploadFile]] = File(None),
@@ -117,11 +110,21 @@ async def advise_endpoint(
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 @router.get("/read-file/{filename}")
 def read_file(filename: str):
     return read_uploaded_file(filename)
 
-from fastapi import Query, Response
 
 CSV_COLUMNS = [
     'use_keywords', 'latin_name_search', 'edibility_rating_search',
@@ -133,19 +136,27 @@ CSV_COLUMNS = [
 ]
 
 @router.get("/search/plants/")
-def search_plants_endpoint(q: str = Query(..., description="Search term using plant name, latin name, or use keyword"),
-                           download: bool = Query(False, description="Set to true to download CSV")):
+def search_plants_endpoint(
+    q: str = Query(..., description="Search term using plant name, latin name, or use keyword"),
+    download: bool = Query(False, description="Set to true to download CSV")
+):
     import pandas as pd
     import io
 
-    file_path = '/Users/patrickkawayechimseu/crop_api_project/data/pfaf_plants_merged.csv'
-    df = pd.read_csv(file_path)
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(BASE_DIR, 'data', 'pfaf_plants_merged.csv')
+
+    try:
+        df = pd.read_csv(file_path)
+    except Exception as e:
+        return {"query": q, "results": [], "message": f"Error reading plant file: {str(e)}"}
 
     search_columns = ['use_keywords', 'latin_name_search', 'common_name_search', 'Scientific Name', 'Common Name']
     mask = False
     for col in search_columns:
         if col in df.columns:
             mask = mask | df[col].astype(str).str.contains(q, case=False, na=False)
+
     filtered_df = df.loc[mask]
 
     if filtered_df.empty:
@@ -168,7 +179,3 @@ def search_plants_endpoint(q: str = Query(..., description="Search term using pl
 
     results = search_plants(q)
     return {"query": q, "results": results}
-
-
-
-
