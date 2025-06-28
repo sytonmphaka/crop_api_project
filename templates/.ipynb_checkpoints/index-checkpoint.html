@@ -81,36 +81,93 @@
   </style>
 </head>
 <body>
-  <!-- =================== CROP TOOLS =================== -->
-  <div id="crop-tools-section">
-    <h1>MLANGIZI PA PHONE</h1>
-    <p class="subtitle">Satilani ndondomeko ya Ulimi wamakono</p>
+<!-- =================== CROP TOOLS =================== -->
+<div id="crop-tools-section">
+  <h1>MLANGIZI PA PHONE</h1>
+  <p class="subtitle">Satilani ndondomeko ya Ulimi wamakono</p>
 
-    <section>
-      <form id="crop-search-form">
-        <label for="crop-keywords">Search Crops (e.g. maize,cassava)</label>
-        <input type="text" id="crop-keywords" name="keywords" required />
-        <button type="submit">Search</button>
-      </form>
-      <div id="crop-search-results" class="output"></div>
-      <a id="crop-download-link" href="#" class="download-link" style="display:none;" target="_blank" download>Download Crop Summary CSV</a>
-    </section>
+  <section>
+    <form id="crop-search-form">
+      <label for="crop-keywords">Search Crops (e.g. maize,cassava)</label>
+      <input type="text" id="crop-keywords" name="keywords" required />
+      <button type="submit">Search</button>
+    </form>
+    <div id="crop-search-results" class="output"></div>
+    <a
+      id="crop-download-link"
+      href="#"
+      class="download-link"
+      style="display:none;"
+      target="_blank"
+      download
+      >Download Crop Summary CSV</a
+    >
+  </section>
 
-    <section style="margin-top: 40px;">
-      <form id="forecast-form">
-        <label for="district-name">Get District Forecast (e.g. karonga)</label>
-        <input type="text" id="district-name" name="district" required />
-        <button type="submit">Get Forecast</button>
-      </form>
-      <div id="forecast-results" class="output"></div>
-    </section>
+  <section style="margin-top: 40px;">
+    <form id="forecast-form">
+      <label for="district-name">Get District Forecast (e.g. karonga)</label>
+      <input type="text" id="district-name" name="district" required />
+      <button type="submit">Get Forecast</button>
+    </form>
+    <div id="forecast-results" class="output"></div>
+  </section>
 
-    <section style="margin-top: 40px;">
-      <button id="generate-calendar-btn">Generate Crop Calendar</button>
-      <div id="calendar-results" class="output"></div>
-      <a id="calendar-download-link" href="#" class="download-link" style="display:none;" target="_blank" download>Download Calendar CSV</a>
-    </section>
-  </div>
+  <section style="margin-top: 40px;">
+    <button id="generate-calendar-btn">Generate Crop Calendar</button>
+    <div id="calendar-results" class="output"></div>
+    <a
+      id="calendar-download-link"
+      href="#"
+      class="download-link"
+      style="display:none;"
+      target="_blank"
+      download
+      >Download Calendar CSV</a
+    >
+  </section>
+</div>
+
+<!-- JavaScript to handle external download -->
+<script>
+  function openInExternalBrowser(url) {
+    window.open(url, '_blank');
+  }
+
+  // Handle crop summary download
+  const cropDownloadLink = document.getElementById('crop-download-link');
+  cropDownloadLink.addEventListener('click', function (e) {
+    e.preventDefault();
+    if (cropDownloadLink.href && cropDownloadLink.href !== '#') {
+      openInExternalBrowser(cropDownloadLink.href);
+    }
+  });
+
+  // Handle calendar download
+  const calendarDownloadLink = document.getElementById('calendar-download-link');
+  calendarDownloadLink.addEventListener('click', function (e) {
+    e.preventDefault();
+    if (calendarDownloadLink.href && calendarDownloadLink.href !== '#') {
+      openInExternalBrowser(calendarDownloadLink.href);
+    }
+  });
+
+  // Example of how you might dynamically set the hrefs after generating content
+  function showCropDownloadLink(url) {
+    cropDownloadLink.href = url;
+    cropDownloadLink.style.display = 'inline-block';
+  }
+
+  function showCalendarDownloadLink(url) {
+    calendarDownloadLink.href = url;
+    calendarDownloadLink.style.display = 'inline-block';
+  }
+
+  // Usage Example:
+  // After your data is processed, call:
+  // showCropDownloadLink('https://yourdomain.com/downloads/crop-summary.csv');
+  // showCalendarDownloadLink('https://yourdomain.com/downloads/calendar.csv');
+</script>
 
   <!-- =================== FARMING ADVICE =================== -->
   <div id="farming-advice-section">
