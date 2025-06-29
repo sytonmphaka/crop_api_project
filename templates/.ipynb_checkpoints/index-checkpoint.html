@@ -1,397 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MLANGIZI PA PHONE - Combined Crop Tools, Farming Advice & Plant Info</title>
-  <link rel="stylesheet" href="/static/style.css" />
-  <style>
-    section {
-      border-bottom: 2px solid #ccc;
-      padding-bottom: 40px;
-      margin-bottom: 40px;
-    }
+  <meta charset="UTF-8">
+  <title>Smart Agriculture</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    #crop-tools-section,
-    #farming-advice-section,
-    #plant-info-section {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 40px 20px;
-      box-sizing: border-box;
-      text-align: center;
-    }
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    #crop-tools-section {
-      background: linear-gradient(135deg, #f0f0f0, #d9d9d9);
-    }
-    #farming-advice-section {
-      background: linear-gradient(135deg, #e6f2ff, #cce0ff);
-    }
-    #plant-info-section {
-      background: linear-gradient(135deg, #fff7e6, #ffe6cc);
-    }
-
-    form, .output, .download-link {
-      width: 100%;
-      max-width: 500px;
-      margin: 10px auto;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    form > label, form > input, form > textarea, form > button {
-      margin-bottom: 12px;
-      font-size: 1rem;
-    }
-
-    button {
-      cursor: pointer;
-      padding: 10px 15px;
-      font-weight: 600;
-      background-color: #0078d4;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #005a9e;
-    }
-
-    .output p {
-      margin: 8px 0;
-    }
-
-    .download-link {
-      text-align: center;
-      margin-top: 15px;
-      display: inline-block;
-      color: #0078d4;
-      font-weight: 600;
-      text-decoration: none;
-    }
-    .download-link:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ request.url_for('static', path='css/style.css') }}">
 </head>
-<body>
-<!-- =================== CROP TOOLS =================== -->
-<div id="crop-tools-section">
-  <h1>MLANGIZI PA PHONE</h1>
-  <p class="subtitle">Satilani ndondomeko ya Ulimi wamakono</p>
+<body class="bg-white font-sans">
 
-  <section>
-    <form id="crop-search-form">
-      <label for="crop-keywords">Search Crops (e.g. maize,cassava)</label>
-      <input type="text" id="crop-keywords" name="keywords" required />
-      <button type="submit">Search</button>
-    </form>
-    <div id="crop-search-results" class="output"></div>
-    <a
-      id="crop-download-link"
-      href="#"
-      class="download-link"
-      style="display:none;"
-      target="_blank"
-      download
-      >Download Crop Summary CSV</a
-    >
-  </section>
+  <!-- Header Section with background image -->
+  <div class="relative h-64 bg-cover bg-center" style="background-image: url('{{ request.url_for('static', path='images/image2.png') }}');">
 
-  <section style="margin-top: 40px;">
-    <form id="forecast-form">
-      <label for="district-name">Get District Forecast (e.g. karonga)</label>
-      <input type="text" id="district-name" name="district" required />
-      <button type="submit">Get Forecast</button>
-    </form>
-    <div id="forecast-results" class="output"></div>
-  </section>
+    <!-- Header Title and Notification Icon -->
+    <div class="absolute top-4 left-0 right-0 flex justify-between items-center px-4 text-white">
+      <div></div> <!-- placeholder for symmetry -->
+      <h2 class="text-xl font-bold text-center">ULIMI WAMAKONO</h2>
+      <a href="{{ request.url_for('updates') }}" class="bg-teal-600 text-white rounded-xl p-4 text-center shadow hover:bg-teal-700 cursor-pointer block">
+  <div class="text-2xl mb-2">🔔</div>
+</a>
 
-  <section style="margin-top: 40px;">
-    <button id="generate-calendar-btn">Generate Crop Calendar</button>
-    <div id="calendar-results" class="output"></div>
-    <a
-      id="calendar-download-link"
-      href="#"
-      class="download-link"
-      style="display:none;"
-      target="_blank"
-      download
-      >Download Calendar CSV</a
-    >
-  </section>
-</div>
+    </div>
 
-<!-- JavaScript to handle external download -->
-<script>
-  function openInExternalBrowser(url) {
-    window.open(url, '_blank');
-  }
+    <!-- Left-side Menu -->
+    <div class="absolute top-16 left-4 text-white space-y-2">
+      <a href="{{ request.url_for('about') }}" class="flex items-center gap-2 hover:underline">
+        <span>👤</span><span>About</span>
+      </a>
+      <a href="{{ request.url_for('farm') }}" class="flex items-center gap-2 hover:underline">
+        <span>📋</span><span>Farm</span>
+      </a>
+      <a href="{{ request.url_for('maphunziro') }}" class="flex items-center gap-2 hover:underline">
+        <span>⏺</span><span>Maphunziro</span>
+      </a>
+    </div>
 
-  // Handle crop summary download
-  const cropDownloadLink = document.getElementById('crop-download-link');
-  cropDownloadLink.addEventListener('click', function (e) {
-    e.preventDefault();
-    if (cropDownloadLink.href && cropDownloadLink.href !== '#') {
-      openInExternalBrowser(cropDownloadLink.href);
-    }
-  });
-
-  // Handle calendar download
-  const calendarDownloadLink = document.getElementById('calendar-download-link');
-  calendarDownloadLink.addEventListener('click', function (e) {
-    e.preventDefault();
-    if (calendarDownloadLink.href && calendarDownloadLink.href !== '#') {
-      openInExternalBrowser(calendarDownloadLink.href);
-    }
-  });
-
-  // Example of how you might dynamically set the hrefs after generating content
-  function showCropDownloadLink(url) {
-    cropDownloadLink.href = url;
-    cropDownloadLink.style.display = 'inline-block';
-  }
-
-  function showCalendarDownloadLink(url) {
-    calendarDownloadLink.href = url;
-    calendarDownloadLink.style.display = 'inline-block';
-  }
-
-  // Usage Example:
-  // After your data is processed, call:
-  // showCropDownloadLink('https://yourdomain.com/downloads/crop-summary.csv');
-  // showCalendarDownloadLink('https://yourdomain.com/downloads/calendar.csv');
-</script>
-
-  <!-- =================== FARMING ADVICE =================== -->
-  <div id="farming-advice-section">
-    <h1>MLANGIZI PA PHONE</h1>
-    <h2>Get Farming Advice</h2>
-
-    <form id="adviceForm" enctype="multipart/form-data">
-      <label for="files">Upload Files (images/docs, optional):</label>
-      <input type="file" name="files" multiple />
-      <label for="soil_ph">Soil pH (1 to 14):</label>
-      <input type="number" name="soil_ph" id="soil_ph" min="1" max="14" required />
-      <label for="moisture">Soil Moisture (%):</label>
-      <input type="number" name="moisture" min="0" max="100" />
-      <label for="district">District:</label>
-      <input type="text" name="district" />
-      <label for="indigenous_knowledge">Local Knowledge (optional):</label>
-      <textarea name="indigenous_knowledge" rows="4"></textarea>
-      <button type="submit">Submit</button>
-    </form>
-    <div id="advice-output" class="output"></div>
+    <!-- Centered Smart Agriculture Title -->
+    <div class="absolute bottom-6 w-full text-center text-white">
+      <h1 class="text-3xl font-bold">Smart Agriculture</h1>
+    </div>
   </div>
 
-  <!-- =================== PLANT INFO SEARCH =================== -->
-  <div id="plant-info-section">
-    <h1>MLANGIZI PA PHONE</h1>
-    <h2>Search Plant Uses or Names</h2>
-    <form id="plant-info-form">
-      <label for="plant-query">Search Plant Use or Name (e.g. medicinal, food):</label>
-      <input type="text" id="plant-query" name="query" required />
-      <button type="submit">Search Plant Info</button>
-    </form>
-    <div id="plant-info-results" class="output"></div>
-    <a id="plant-csv-download" class="download-link" href="#" style="display:none;" download>Download Plant Info CSV</a>
+  <!-- Main Button Grid Section with image1 background -->
+  <div class="bg-cover bg-center py-10 px-6" style="background-image: url('{{ request.url_for('static', path='images/image1.png') }}');">
+    <div class="grid grid-cols-2 gap-4">
+
+      <a href="{{ request.url_for('advise') }}" class="bg-teal-600 text-white rounded-xl p-4 text-center shadow hover:bg-teal-700 cursor-pointer block">
+        <div class="text-2xl mb-2">🌿</div>
+        <div class="font-semibold">Advise</div>
+      </a>
+
+      <a href="{{ request.url_for('identify_plant') }}" class="bg-teal-600 text-white rounded-xl p-4 text-center shadow hover:bg-teal-700 cursor-pointer block">
+        <div class="text-2xl mb-2">🔍</div>
+        <div class="font-semibold">Identify Plant</div>
+      </a>
+
+      <a href="{{ request.url_for('community') }}" class="bg-teal-600 text-white rounded-xl p-4 text-center shadow hover:bg-teal-700 cursor-pointer block">
+        <div class="text-2xl mb-2">👥</div>
+        <div class="font-semibold">Community</div>
+      </a>
+
+      <a href="{{ request.url_for('flooddrought') }}" class="bg-teal-600 text-white rounded-xl p-4 text-center shadow hover:bg-teal-700 cursor-pointer block">
+        <div class="text-2xl mb-2">💧🔥</div>
+        <div class="font-semibold">Flooddrought</div>
+      </a>
+    </div>
+
+    <!-- Medicrop Button -->
+    <div class="flex justify-center mt-6">
+      <a href="{{ request.url_for('medicrop') }}">
+        <button class="bg-teal-700 text-white py-2 px-6 rounded-full shadow-md hover:bg-teal-800">💚 Medicrop</button>
+      </a>
+    </div>
   </div>
 
-  <script>
-    (function() {
-      const params = new URLSearchParams(window.location.search);
-      const page = params.get('page');
-      const sections = {
-        'crop-tools': 'crop-tools-section',
-        'farming-advice': 'farming-advice-section',
-        'plant-info': 'plant-info-section',
-      };
-
-      if (page && sections[page]) {
-        Object.values(sections).forEach(id => {
-          const el = document.getElementById(id);
-          if(el) el.style.display = 'none';
-        });
-        const showEl = document.getElementById(sections[page]);
-        if(showEl) showEl.style.display = 'block';
-      }
-    })();
-
-    document.getElementById('crop-search-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const keywords = document.getElementById('crop-keywords').value.trim();
-      if (!keywords) return;
-      const resultsDiv = document.getElementById('crop-search-results');
-      const downloadLink = document.getElementById('crop-download-link');
-      resultsDiv.innerHTML = 'Loading...';
-      downloadLink.style.display = 'none';
-
-      try {
-        const response = await fetch(`search/?keywords=${encodeURIComponent(keywords)}`);
-        const data = await response.json();
-
-        if(data.summary && data.summary.length) {
-          const formatted = data.summary.map(s => `<p>${s}</p>`).join('');
-          resultsDiv.innerHTML = formatted;
-
-          if(data.note && data.note.includes('Results saved')) {
-            downloadLink.href = 'results/searched_crops_summary.csv';
-            downloadLink.style.display = 'inline-block';
-          }
-        } else {
-          resultsDiv.innerHTML = `<p>No results found for: ${keywords}</p>`;
-        }
-      } catch(err) {
-        resultsDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-      }
-    });
-
-    document.getElementById('forecast-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const district = document.getElementById('district-name').value.trim();
-      if (!district) return;
-      const resultsDiv = document.getElementById('forecast-results');
-      resultsDiv.innerHTML = 'Loading...';
-
-      try {
-        const response = await fetch(`forecast/?district=${encodeURIComponent(district)}`);
-        const data = await response.json();
-
-        if(data.error) {
-          resultsDiv.innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
-        } else if(data.forecast_summary) {
-          const mf = data.forecast_summary.monthly_forecast;
-          const ss = data.forecast_summary.seasonal_summary;
-          let monthlyHtml = '<h3>Monthly Forecast</h3><ul>';
-          for (const month in mf) {
-            monthlyHtml += `<li><strong>${month}:</strong> ${mf[month]}</li>`;
-          }
-          monthlyHtml += '</ul>';
-          let seasonalHtml = '<h3>Seasonal Summary</h3>';
-          seasonalHtml += ss.map(p => `<p>${p}</p>`).join('');
-          resultsDiv.innerHTML = monthlyHtml + seasonalHtml;
-        } else {
-          resultsDiv.innerHTML = '<p>No forecast available.</p>';
-        }
-      } catch(err) {
-        resultsDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-      }
-    });
-
-    document.getElementById('generate-calendar-btn').addEventListener('click', async function() {
-      const resultsDiv = document.getElementById('calendar-results');
-      const downloadLink = document.getElementById('calendar-download-link');
-      resultsDiv.innerHTML = 'Generating calendar...';
-      downloadLink.style.display = 'none';
-
-      try {
-        const response = await fetch('calendar/');
-        const data = await response.json();
-
-        if(data.error) {
-          resultsDiv.innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
-        } else {
-          let html = `<p>${data.message}</p>`;
-          if(data.calendar_preview && data.calendar_preview.length > 0) {
-            data.calendar_preview.forEach(row => {
-              html += '<p>' + Object.entries(row).map(([k,v]) => `${k}: ${v}`).join(', ') + '</p>';
-            });
-          }
-          resultsDiv.innerHTML = html;
-          if(data.saved_to) {
-            downloadLink.href = data.saved_to;
-            downloadLink.style.display = 'inline-block';
-          }
-        }
-      } catch(err) {
-        resultsDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-      }
-    });
-
-    document.getElementById('adviceForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const formData = new FormData(this);
-      const outputDiv = document.getElementById('advice-output');
-      outputDiv.innerHTML = 'Sending advice request...';
-
-      try {
-        const response = await fetch('advise/', {
-          method: 'POST',
-          body: formData
-        });
-        const result = await response.json();
-        outputDiv.innerHTML = `
-          <p><strong>Summary:</strong> ${result.summary || 'No summary available.'}</p>
-          <p><strong>Recommended Crops:</strong> ${(result.recommended_crops || []).join(', ') || 'None'}</p>
-        `;
-
-        if (result.uploaded_files && result.uploaded_files.length > 0) {
-          const fileListDiv = document.createElement('div');
-          fileListDiv.className = 'action-bar';
-          fileListDiv.innerText = `📂 Uploaded ${result.uploaded_files.length} file(s) - Click to View`;
-          fileListDiv.onclick = () => showFileList(result.uploaded_files);
-          outputDiv.appendChild(fileListDiv);
-        }
-      } catch (err) {
-        outputDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-      }
-    });
-
-    function showFileList(files) {
-      const outputDiv = document.getElementById('advice-output');
-      outputDiv.innerHTML = `<div class="action-bar" onclick="window.location.reload()">⬅ Back</div>`;
-      files.forEach(file => {
-        const fileBar = document.createElement('div');
-        fileBar.className = 'action-bar';
-        fileBar.innerText = file;
-        fileBar.onclick = () => readFileContent(file);
-        outputDiv.appendChild(fileBar);
-      });
-    }
-
-    async function readFileContent(filename) {
-      const response = await fetch(`read-file/${filename}`);
-      const text = await response.text();
-      const outputDiv = document.getElementById('advice-output');
-      outputDiv.innerHTML = `
-        <div class="action-bar" onclick="window.location.reload()">⬅ Back</div>
-        <h3>${filename}</h3>
-        <pre>${text}</pre>
-      `;
-    }
-
-    document.getElementById('plant-info-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const query = document.getElementById('plant-query').value.trim();
-      if (!query) return;
-      const resultsDiv = document.getElementById('plant-info-results');
-      const downloadLink = document.getElementById('plant-csv-download');
-      resultsDiv.innerHTML = 'Searching...';
-      downloadLink.style.display = 'none';
-
-      try {
-        const response = await fetch(`search/plants/?q=${encodeURIComponent(query)}`);
-        const data = await response.json();
-
-        if (data.results && Array.isArray(data.results) && data.results.length > 0) {
-          const uniqueResults = [...new Set(data.results)];
-          const formatted = uniqueResults.map(item => `<p>${item}</p>`).join('');
-          resultsDiv.innerHTML = formatted;
-          downloadLink.href = `search/plants/?q=${encodeURIComponent(query)}&download=true`;
-          downloadLink.style.display = 'inline-block';
-        } else {
-          resultsDiv.innerHTML = `<p>No results found for "${query}".</p>`;
-        }
-      } catch (err) {
-        resultsDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-      }
-    });
-  </script>
+  <!-- Footer Text -->
+  <p class="text-center text-gray-700 py-6 px-4 bg-white">
+    Get the latest insights and recommendations
+  </p>
 </body>
 </html>

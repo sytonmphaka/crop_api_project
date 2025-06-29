@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Farm Notes - MLANGIZI PA PHONE</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #f3fff3, #e0ffe0);
+      padding: 40px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2e7d32;
+    }
+
+    .note-form {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      background-color: #388e3c;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #2e7d32;
+    }
+
+    .saved-notes {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .note-entry {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      background-color: #e6f4ea;
+      border-left: 5px solid #66bb6a;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .note-preview {
+      flex: 1;
+      text-align: left;
+      color: #333;
+      cursor: pointer;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      margin-left: 10px;
+    }
+
+    .action-buttons button {
+      background: #ccc;
+      color: black;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .action-buttons button:hover {
+      background: #bbb;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 600px;
+      color: #333;
+      white-space: pre-line;
+      line-height: 1.6;
+    }
+
+    .close {
+      float: right;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #888;
+    }
+
+    .close:hover {
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>📝 Farm Notes</h1>
+
+  <div class="note-form">
+    <form id="noteForm">
+      <label for="note">Enter your note:</label>
+      <textarea id="note" name="note" placeholder="e.g. Planted tomatoes on field A today..."></textarea>
+      <button type="submit">Save Note</button>
+    </form>
+  </div>
+
+  <div class="saved-notes" id="savedNotes">
+    <h3>Saved Notes</h3>
+    <!-- Notes will appear here -->
+  </div>
+
+  <!-- Modal -->
+  <div id="noteModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <p id="modalNoteContent"></p>
+    </div>
+  </div>
+
+  <script>
+    const noteForm = document.getElementById('noteForm');
+    const noteInput = document.getElementById('note');
+    const savedNotes = document.getElementById('savedNotes');
+    const modal = document.getElementById('noteModal');
+    const modalContent = document.getElementById('modalNoteContent');
+    const closeModal = document.getElementById('closeModal');
+
+    let editingIndex = null;
+
+    function loadNotes() {
+      const notes = JSON.parse(localStorage.getItem('farmNotes')) || [];
+      savedNotes.innerHTML = '<h3>Saved Notes</h3>';
+      notes.forEach((note, index) => {
+        const preview = note.split('\n')[0].slice(0, 60) + (note.length > 60 ? '...' : '');
+
+        const noteEntry = document.createElement('div');
+        noteEntry.className = 'note-entry';
+
+        const notePreview = document.createElement('div');
+        notePreview.className = 'note-preview';
+        notePreview.textContent = `${index + 1}. ${preview}`;
+        notePreview.onclick = () => showModal(note);
+
+        const buttons = document.createElement('div');
+        buttons.className = 'action-buttons';
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '✏️';
+        editBtn.title = "Edit";
+        editBtn.onclick = () => {
+          noteInput.value = note;
+          editingIndex = index;
+        };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '🗑️';
+        deleteBtn.title = "Delete";
+        deleteBtn.onclick = () => {
+          notes.splice(index, 1);
+          localStorage.setItem('farmNotes', JSON.stringify(notes));
+          loadNotes();
+        };
+
+        buttons.appendChild(editBtn);
+        buttons.appendChild(deleteBtn);
+        noteEntry.appendChild(notePreview);
+        noteEntry.appendChild(buttons);
+        savedNotes.appendChild(noteEntry);
+      });
+    }
+
+    function showModal(note) {
+      modalContent.textContent = note;
+      modal.style.display = 'block';
+    }
+
+    closeModal.onclick = () => modal.style.display = 'none';
+    window.onclick = (event) => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    }
+
+    noteForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const note = noteInput.value.trim();
+      if (note) {
+        const notes = JSON.parse(localStorage.getItem('farmNotes')) || [];
+        if (editingIndex !== null) {
+          notes[editingIndex] = note;
+          editingIndex = null;
+        } else {
+          notes.push(note);
+        }
+        localStorage.setItem('farmNotes', JSON.stringify(notes));
+        noteInput.value = '';
+        loadNotes();
+      }
+    });
+
+    loadNotes();
+  </script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MLANGIZI PA PHONE - About</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      margin: 0;
+      padding: 40px 20px;
+      color: #333;
+      line-height: 1.6;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #0078d4;
+    }
+
+    p {
+      font-size: 1.1rem;
+      background: #fff8dc;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .button-container {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    button {
+      background-color: #0078d4;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 1rem;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,120,212,0.4);
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #005a9e;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      max-width: 400px;
+      text-align: center;
+      position: relative;
+    }
+
+    .close-btn {
+      color: #aaa;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus {
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>About MLANGIZI PA PHONE</h1>
+
+  <p>
+    This web application, titled <strong>MLANGIZI PA PHONE</strong>, is a comprehensive and interactive digital advisory platform designed to support smallholder farmers, agricultural extension workers, and other stakeholders with timely, localized, and actionable agricultural information. It integrates multiple functionalities into one unified system, with an emphasis on accessibility, simplicity, and relevance to Malawi’s farming communities. The app is structured into vertically arranged sections, each with a dedicated role—from <em>crop advisory tools</em> that allow users to search for crop-specific guidance, generate planting calendars, and access district-level weather forecasts, to <em>farming advice</em>, where users can input soil pH, moisture, and indigenous knowledge, optionally upload relevant images or documents, and receive AI-generated recommendations on suitable crops and agricultural practices. Additionally, the platform hosts a <em>plant information search</em> tool that enables users to search for the traditional uses or names of plants—particularly medicinal or edible ones—providing downloadable summaries for educational and cultural preservation purposes. The system also offers an <em>updates section</em> for recent documents and guides, and an <em>upload interface</em> for new content, enhancing collaboration between users and administrators. Further enriching its utility, the app includes integration capabilities with external applications such as a <em>Shiny-based flood and drought dashboard</em>, which is accessible within its own routed page (<code>/flooddrought</code>). Each of these tools is crafted within an elegant, user-friendly interface, leveraging gradient-colored backgrounds, structured sections, and responsive layouts to ensure usability across devices. Altogether, MLANGIZI PA PHONE serves as a digital agricultural companion, combining climate-smart agriculture, indigenous knowledge, plant medicine, and modern data tools into a single, farmer-centered ecosystem aimed at building resilience, boosting productivity, and fostering informed decision-making in Malawi’s agri-food landscape.
+  </p>
+
+  <div class="button-container">
+    <button id="developerBtn">Developer</button>
+  </div>
+
+  <!-- Modal structure -->
+  <div id="developerModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
+    <div class="modal-content">
+      <span class="close-btn" id="closeModal">&times;</span>
+      <h2 id="modalTitle">Hello</h2>
+      <p id="modalDesc">My name is Syton Mphaka, a final year student pursuing a Bachelor of Science in Meteorology and Climate Science at the Malawi University of Science and Technology. Growing up in Malawi, I have witnessed firsthand the devastating impact that climate and weather events have had on agriculture, health, livelihoods, properties and infrastructure. These experiences stirred something deep within me, a desire not just to understand the science behind these events, but to become part of the solution through all my possibilities. That is what led me to choose this program to gain the knowledge, skills, and tools necessary to help my country and others adapt to and mitigate the effects of climate-related disasters. One event that changed me forever was Cyclone Freddy in 2022. I saw people being washed away by floods, families displaced, crops and livestock being destroyed, homes leveled, and even national infrastructure completely wiped out. It broke my heart, but it also ignited a flame in me, a flame of purpose. I began researching the underlying causes of such severe disaster impacts, not just in terms of the cyclone’s intensity, but also in how our systems and communities were unprepared to such. From my research, I discovered gaps, in early warning systems, in communication, in community readiness. And so I began to create innovative, community-based solutions. Many of these can be seen on my website under Projects, where I’ve developed early warning system that use sensors, mobile apps, auto-calling alerts, and more to save lives. To deepen my understanding, I also enrolled in an online Disaster and Risk Management course. Although I was unable to complete it due to technical challenges with my device and missed out on certification, I continued to study the material on my own. My passion has never been about certificates but it's been about making an impact. link: https://sites.google.com/view/syton/projects.</p>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('developerModal');
+    const btn = document.getElementById('developerBtn');
+    const closeBtn = document.getElementById('closeModal');
+
+    btn.onclick = function() {
+      modal.style.display = 'block';
+    }
+
+    closeBtn.onclick = function() {
+      modal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
