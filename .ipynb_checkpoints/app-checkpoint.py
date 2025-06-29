@@ -41,7 +41,7 @@ async def identify_plant(request: Request):
 
 @app.get("/community", response_class=HTMLResponse)
 async def community(request: Request):
-    return HTMLResponse("Welcome to Community page")
+    return templates.TemplateResponse("market.html", {"request": request})
 
 @app.get("/flooddrought", response_class=HTMLResponse)
 async def flooddrought(request: Request):
