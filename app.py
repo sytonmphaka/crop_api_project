@@ -35,9 +35,18 @@ async def advise(request: Request):
     return templates.TemplateResponse("advise.html", {"request": request})
 
 
-@app.get("/identify-plant", response_class=HTMLResponse)
+@app.get("/uploads", response_class=HTMLResponse)
 async def identify_plant(request: Request):
     return await upload_page(request)
+
+
+
+@app.get("/identify-plant", response_class=HTMLResponse)
+async def identify_plant(request: Request):
+    return templates.TemplateResponse("identity.html", {"request": request})
+
+
+
 
 @app.get("/community", response_class=HTMLResponse)
 async def community(request: Request):
@@ -59,6 +68,14 @@ async def about(request: Request):
 @app.get("/farm", response_class=HTMLResponse)
 async def farm(request: Request):
     return templates.TemplateResponse("notes.html", {"request": request})
+
+
+
+
+
+
+
+
 
 @app.get("/maphunziro", response_class=HTMLResponse)
 async def maphunziro(request: Request):
