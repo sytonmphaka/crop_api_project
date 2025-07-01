@@ -501,3 +501,14 @@ def search_plants(search_term: str, limit=10):
         results.append(para)
 
     return results
+
+
+
+
+
+
+
+
+
+
+

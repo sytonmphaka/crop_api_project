@@ -8,6 +8,8 @@ from eco_crop_routes import router as eco_router
 from upload_routes import router as upload_router
 from upload_routes import upload_page, updates_page  # for reuse
 
+
+
 app = FastAPI()
 
 # Middleware
@@ -36,7 +38,7 @@ async def advise(request: Request):
 
 
 @app.get("/uploads", response_class=HTMLResponse)
-async def identify_plant(request: Request):
+async def uploads(request: Request):
     return await upload_page(request)
 
 
@@ -79,7 +81,7 @@ async def farm(request: Request):
 
 @app.get("/maphunziro", response_class=HTMLResponse)
 async def maphunziro(request: Request):
-    return HTMLResponse("Welcome to Maphunziro page")
+    return templates.TemplateResponse("maphunziro.html", {"request": request})
 
 from upload_routes import fetch_documents  # Make sure this is imported
 
@@ -91,3 +93,13 @@ async def updates(request: Request):
 # Include other routers
 app.include_router(eco_router)
 app.include_router(upload_router)
+
+
+
+
+
+
+
+
+
+
