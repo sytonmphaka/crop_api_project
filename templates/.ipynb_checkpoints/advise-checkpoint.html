@@ -85,7 +85,7 @@
         <button type="submit">Search</button>
       </form>
       <div id="crop-search-results" class="output"></div>
-      <a id="crop-download-link" href="#" class="download-link" style="display:none;" target="_blank" download>Download Crop Summary CSV</a>
+      <a id="crop-download-link" href="#" class="download-link" style="display:none;" download>Download Crop Summary CSV</a>
     </section>
 
     <section style="margin-top: 40px;">
@@ -100,33 +100,14 @@
     <section style="margin-top: 40px;">
       <button id="generate-calendar-btn">Generate Crop Calendar</button>
       <div id="calendar-results" class="output"></div>
-      <a id="calendar-download-link" href="#" class="download-link" style="display:none;" target="_blank" download>Download Calendar CSV</a>
+      <a id="calendar-download-link" href="#" class="download-link" style="display:none;" download>Download Calendar CSV</a>
     </section>
   </div>
 
-  <!-- JavaScript to handle external download -->
+  <!-- JavaScript for actions -->
   <script>
-    function openInExternalBrowser(url) {
-      window.open(url, '_blank');
-    }
-
-    // Crop Summary Download
     const cropDownloadLink = document.getElementById('crop-download-link');
-    cropDownloadLink.addEventListener('click', function (e) {
-      e.preventDefault();
-      if (cropDownloadLink.href && cropDownloadLink.href !== '#') {
-        openInExternalBrowser(cropDownloadLink.href);
-      }
-    });
-
-    // Calendar Download
     const calendarDownloadLink = document.getElementById('calendar-download-link');
-    calendarDownloadLink.addEventListener('click', function (e) {
-      e.preventDefault();
-      if (calendarDownloadLink.href && calendarDownloadLink.href !== '#') {
-        openInExternalBrowser(calendarDownloadLink.href);
-      }
-    });
 
     // Show links after generation
     function showCropDownloadLink(url) {
@@ -155,8 +136,7 @@
         if (data.summary && data.summary.length) {
           resultsDiv.innerHTML = data.summary.map(s => `<p>${s}</p>`).join('');
           if (data.note && data.note.includes('Results saved')) {
-            cropDownloadLink.href = 'results/searched_crops_summary.csv';
-            cropDownloadLink.style.display = 'inline-block';
+            showCropDownloadLink('results/searched_crops_summary.csv');
           }
         } else {
           resultsDiv.innerHTML = `<p>No results found for: ${keywords}</p>`;
@@ -220,8 +200,7 @@
           }
           resultsDiv.innerHTML = html;
           if (data.saved_to) {
-            calendarDownloadLink.href = data.saved_to;
-            calendarDownloadLink.style.display = 'inline-block';
+            showCalendarDownloadLink(data.saved_to);
           }
         }
       } catch (err) {
