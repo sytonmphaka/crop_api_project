@@ -28,8 +28,8 @@
     </div>
 
     <!-- Left-side Menu as Buttons (text-fit) -->
-    <!-- Left-side Menu as Vertically Aligned Buttons -->
-<div class="absolute top-16 left-4 flex flex-col items-start space-y-2">
+   <!-- Left-side Menu as Vertically Aligned Buttons with more top spacing -->
+<div class="absolute top-24 left-4 flex flex-col items-start space-y-2">
   <a href="{{ request.url_for('about') }}" class="inline-flex items-center gap-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-lg shadow hover:bg-blue-200 text-sm">
     <span>👤</span><span>About</span>
   </a>
@@ -40,6 +40,7 @@
     <span>⏺</span><span>Maphunziro</span>
   </a>
 </div>
+
 
 
 
@@ -57,7 +58,7 @@
 
       <a href="{{ request.url_for('advise') }}" class="bg-teal-600 text-white rounded-xl p-4 text-center shadow hover:bg-teal-700 cursor-pointer block">
         <div class="text-2xl mb-2">🌿</div>
-        <div class="font-semibold">Advise</div>
+        <div class="font-semibold">Advice</div>
       </a>
 
       <a href="{{ request.url_for('identify_plant') }}" class="bg-teal-600 text-white rounded-xl p-4 text-center shadow hover:bg-teal-700 cursor-pointer block">

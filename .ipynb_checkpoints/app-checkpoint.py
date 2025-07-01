@@ -32,7 +32,7 @@ templates = Jinja2Templates(directory="templates")
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get("/advise", response_class=HTMLResponse)
+@app.get("/advice", response_class=HTMLResponse)
 async def advise(request: Request):
     return templates.TemplateResponse("advise.html", {"request": request})
 
