@@ -146,18 +146,19 @@
       white-space: pre-line;
     }
 
-    /* Media query for very small screens: stack vertically */
+    /* Media query for very small screens: at least 3 buttons per row */
     @media (max-width: 480px) {
       .navbar {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 8px 0;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px 8px;
+        padding: 8px;
       }
 
       .nav-tab {
         flex-grow: 0;
-        width: 100%;
-        margin: 4px 0;
+        width: auto;
+        margin: 0;
       }
     }
   </style>
