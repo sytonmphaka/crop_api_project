@@ -7,6 +7,7 @@ from fastapi.templating import Jinja2Templates
 from eco_crop_routes import router as eco_router
 from upload_routes import router as upload_router
 from upload_routes import upload_page, updates_page  # for reuse
+
 from fastapi.responses import JSONResponse
 from supabase_utils import (
     insert_user_data, fetch_user_data, 
@@ -108,6 +109,7 @@ app.include_router(upload_router)
 
 
 
+
 # For tools/materials businesses
 @app.post("/register_business")
 async def register_business(request: Request):
@@ -151,7 +153,6 @@ async def get_products():
         return JSONResponse(content={"products": products})
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": "Error fetching products", "error": str(e)})
-
 
 
 

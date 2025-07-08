@@ -6,40 +6,106 @@
   <title>Market Locator - MLANGIZI PA PHONE</title>
   <style>
     body, html {
-      height: 100%; margin: 0;
-      font-family: Arial, sans-serif; color: white;
+      height: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: white;
       background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
         url('/static/images/image3.jpg') no-repeat center center fixed;
       background-size: cover;
     }
-    .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto;
-      background-color: rgba(0,0,0,0.4); padding-top: 60px; }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+      padding-top: 60px;
+    }
+
     .modal-content {
-      background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888;
-      width: 80%; max-height: 80%; overflow-y: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); color: black;
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-height: 80%;
+      overflow-y: auto;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      color: black;
       border-radius: 8px;
       position: relative;
     }
-    .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-    .close:hover, .close:focus { color: black; text-decoration: none; }
-    .navbar { display: flex; justify-content: center; background-color: rgba(0, 0, 0, 0.6);
-      padding: 12px 0; position: fixed; top: 0; width: 100%; z-index: 1000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.7); }
-    .nav-tab {
-      margin: 0 8px; padding: 6px 12px; cursor: pointer;
-      background-color: rgba(255, 255, 255, 0.15); border-radius: 5px;
-      font-weight: bold; color: white; text-transform: uppercase; font-size: 0.85rem;
-      user-select: none;
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
     }
-    .nav-tab:hover { background-color: rgba(255, 255, 255, 0.35); }
+
+    .close:hover, .close:focus {
+      color: black;
+      text-decoration: none;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 12px 0;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    }
+
+    .nav-tab {
+      margin: 0 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+      background-color: rgba(255, 255, 255, 0.15);
+      border-radius: 5px;
+      font-weight: bold;
+      color: white;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      user-select: none;
+      border: 2px solid transparent;
+      transition: background-color 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .nav-tab:hover {
+      background-color: rgba(255, 255, 255, 0.35);
+      border-color: #a8e6a1;
+    }
+
     .button {
-      background-color: #4CAF50; color: white; padding: 10px 20px; margin: 5px 0;
-      border: none; cursor: pointer; border-radius: 5px; display: block; width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      margin: 5px 0;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      display: block;
+      width: 100%;
       text-align: left;
       font-size: 1rem;
     }
-    .button:hover { background-color: #45a049; }
-    /* Ensure vertical stacking with spacing */
+
+    .button:hover {
+      background-color: #45a049;
+    }
+
     #marketList, #productMarketList {
       display: flex;
       flex-direction: column;
@@ -47,7 +113,7 @@
       max-height: 60vh;
       overflow-y: auto;
     }
-    /* WhatsApp icon style */
+
     .whatsapp-button {
       display: inline-flex;
       align-items: center;
@@ -61,12 +127,14 @@
       text-decoration: none;
       margin-top: 15px;
     }
+
     .whatsapp-button svg {
       margin-right: 8px;
       height: 24px;
       width: 24px;
       fill: white;
     }
+
     .contact-info {
       margin-top: 15px;
       font-size: 0.95rem;
@@ -76,11 +144,12 @@
   </style>
 </head>
 <body>
+
   <nav class="navbar">
     <div class="nav-tab" onclick="openMarketModal()">Find Market</div>
     <div class="nav-tab" onclick="alert('hello')">Ask</div>
     <div class="nav-tab" onclick="openRegisterModal()">Register</div>
-    <div class="nav-tab" onclick="openProductMarketModal()">malonda</div>
+    <div class="nav-tab" onclick="openProductMarketModal()">Malonda</div>
     <div class="nav-tab" onclick="alert('hello')">Your Orders</div>
   </nav>
 
@@ -137,12 +206,8 @@
     <div class="modal-content">
       <span class="close" onclick="closeModal('noWebsiteModal')">&times;</span>
       <h2>Welcome</h2>
-      <p>
-        If you don't have a website page or want to register without a website, contact Syton Mphaka through:
-      </p>
-      <p>
-        Ngati mkufuna kulembetsa koma mulibe website, muyankhuleni/muuzeni Syton Mphaka kudzera pa:
-      </p>
+      <p>If you don't have a website or want to register without one, contact Syton Mphaka through:</p>
+      <p>Ngati mkufuna kulembetsa koma mulibe website, muyankhuleni/muuzeni Syton Mphaka kudzera pa:</p>
       <div class="contact-info">
         Phone: 0881395799, 0990396900<br>
         Email: sytonmphaka12345@gmail.com, mec-020-21@must.ac.mw
@@ -213,7 +278,6 @@
       .then(data => {
         alert(data.message);
         closeModal('detailsModal');
-        // Clear form after submit
         document.getElementById("businessForm").reset();
       })
       .catch(e => alert("Error saving business: " + e));
@@ -238,7 +302,7 @@
     }
 
     function openProductMarketModal() {
-      fetch('/products')  /* Ensure this matches your FastAPI endpoint */
+      fetch('/products')
         .then(res => res.json())
         .then(data => {
           const list = document.getElementById("productMarketList");
