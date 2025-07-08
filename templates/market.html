@@ -57,6 +57,7 @@
 
     .navbar {
       display: flex;
+      flex-wrap: wrap;          /* enable wrapping */
       justify-content: center;
       background-color: rgba(0, 0, 0, 0.6);
       padding: 12px 0;
@@ -68,8 +69,8 @@
     }
 
     .nav-tab {
-      margin: 0 8px;
-      padding: 6px 12px;
+      margin: 6px 8px;          /* more breathing room */
+      padding: 10px 14px;
       cursor: pointer;
       background-color: rgba(255, 255, 255, 0.15);
       border-radius: 5px;
@@ -81,6 +82,9 @@
       border: 2px solid transparent;
       transition: background-color 0.3s ease;
       white-space: nowrap;
+      flex-grow: 1;             /* allow flexible width */
+      min-width: 120px;         /* minimum width for each tab */
+      text-align: center;
     }
 
     .nav-tab:hover {
@@ -141,16 +145,31 @@
       line-height: 1.4;
       white-space: pre-line;
     }
+
+    /* Media query for very small screens: stack vertically */
+    @media (max-width: 480px) {
+      .navbar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 8px 0;
+      }
+
+      .nav-tab {
+        flex-grow: 0;
+        width: 100%;
+        margin: 4px 0;
+      }
+    }
   </style>
 </head>
 <body>
 
   <nav class="navbar">
-    <div class="nav-tab" onclick="openMarketModal()">Find Market</div>
-    <div class="nav-tab" onclick="alert('hello')">Ask</div>
-    <div class="nav-tab" onclick="openRegisterModal()">Register</div>
+    <div class="nav-tab" onclick="openMarketModal()">Azipangizo</div>
+    <div class="nav-tab" onclick="alert('hello')">Futsani</div>
+    <div class="nav-tab" onclick="openRegisterModal()">Lembetsani</div>
     <div class="nav-tab" onclick="openProductMarketModal()">Malonda</div>
-    <div class="nav-tab" onclick="alert('hello')">Your Orders</div>
+    <div class="nav-tab" onclick="alert('hello')">Zomwemwagula</div>
   </nav>
 
   <!-- Modals -->
@@ -183,7 +202,7 @@
     <div class="modal-content">
       <span class="close" onclick="closeModal('websiteModal')">&times;</span>
       <h2>Does the business have a website?</h2>
-      <button onclick="openDetailsModal(true)">With Website</button>
+      <button onclick="openDetailsModal()">With Website</button>
       <button onclick="openNoWebsiteModal()">Without Website</button>
     </div>
   </div>
@@ -262,10 +281,15 @@
     document.getElementById("businessForm").onsubmit = function(event) {
       event.preventDefault();
 
-      const name = document.getElementById("business_name").value;
-      const status = document.getElementById("status").value;
-      const website = document.getElementById("website").value;
+      const name = document.getElementById("business_name").value.trim();
+      const status = document.getElementById("status").value.trim();
+      const website = document.getElementById("website").value.trim();
       const type = document.getElementById("business_type").value;
+
+      if (!name || !status || !website) {
+        alert("Please fill in all fields.");
+        return;
+      }
 
       const endpoint = type === 'tools' ? '/register_business' : '/register_product';
 
@@ -276,7 +300,7 @@
       })
       .then(res => res.json())
       .then(data => {
-        alert(data.message);
+        alert(data.message || "Business saved successfully!");
         closeModal('detailsModal');
         document.getElementById("businessForm").reset();
       })
@@ -289,13 +313,17 @@
         .then(data => {
           const list = document.getElementById("marketList");
           list.innerHTML = "";
-          data.businesses.forEach(b => {
-            const btn = document.createElement("button");
-            btn.className = "button";
-            btn.innerText = `${b.name} (${b.status})`;
-            btn.onclick = () => window.open(b.website, "_blank");
-            list.appendChild(btn);
-          });
+          if (data.businesses && data.businesses.length > 0) {
+            data.businesses.forEach(b => {
+              const btn = document.createElement("button");
+              btn.className = "button";
+              btn.innerText = `${b.name} (${b.status})`;
+              btn.onclick = () => window.open(b.website, "_blank");
+              list.appendChild(btn);
+            });
+          } else {
+            list.innerHTML = "<p>No tools/materials businesses found.</p>";
+          }
           document.getElementById("marketModal").style.display = "block";
         })
         .catch(e => alert("Error fetching businesses: " + e));
@@ -307,17 +335,32 @@
         .then(data => {
           const list = document.getElementById("productMarketList");
           list.innerHTML = "";
-          data.products.forEach(b => {
-            const btn = document.createElement("button");
-            btn.className = "button";
-            btn.innerText = `${b.name} (${b.status})`;
-            btn.onclick = () => window.open(b.website, "_blank");
-            list.appendChild(btn);
-          });
+          if (data.products && data.products.length > 0) {
+            data.products.forEach(b => {
+              const btn = document.createElement("button");
+              btn.className = "button";
+              btn.innerText = `${b.name} (${b.status})`;
+              btn.onclick = () => window.open(b.website, "_blank");
+              list.appendChild(btn);
+            });
+          } else {
+            list.innerHTML = "<p>No product businesses found.</p>";
+          }
           document.getElementById("productMarketModal").style.display = "block";
         })
         .catch(e => alert("Error fetching product businesses: " + e));
     }
+
+    // Close modal on clicking outside modal-content
+    window.onclick = function(event) {
+      const modals = document.querySelectorAll('.modal');
+      modals.forEach(modal => {
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      });
+    };
   </script>
+
 </body>
 </html>
