@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Market Locator - MLANGIZI PA PHONE</title>
+  <style>
+    /* Full page background image */
+    body, html {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: white;
+      background: 
+        linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+        url('/static/images/image3.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    /* Nav bar container */
+    .navbar {
+      display: flex;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 12px 0;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    }
+
+    /* Each tab */
+    .nav-tab {
+      margin: 0 8px;              /* reduced side margin */
+      padding: 6px 12px;          /* reduced padding */
+      cursor: pointer;
+      background-color: rgba(255, 255, 255, 0.15);
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+      user-select: none;
+      color: white;
+      text-transform: uppercase;
+      font-size: 0.85rem;         /* smaller font size */
+      border: 2px solid transparent;
+      white-space: nowrap;
+    }
+    .nav-tab:hover {
+      background-color: rgba(255, 255, 255, 0.35);
+      border-color: #a8e6a1;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-tab" onclick="alert('hello')">Find Market</div>
+    <div class="nav-tab" onclick="alert('hello')">Ask</div>
+    <div class="nav-tab" onclick="alert('hello')">Register</div>
+    <div class="nav-tab" onclick="alert('hello')">Your Orders</div>
+  </nav>
+
+  <!-- Optional content placeholder -->
+  <div style="padding-top: 70px; text-align: center;">
+    <h1>Welcome to Market Locator</h1>
+    <p>Use the tabs above to navigate.</p>
+  </div>
+
+</body>
+</html>

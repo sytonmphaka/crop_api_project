@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crop Tools - MLANGIZI PA PHONE</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    #crop-tools-section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      box-sizing: border-box;
+      text-align: center;
+      background: linear-gradient(135deg, #f0f0f0, #d9d9d9);
+    }
+
+    section {
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 40px;
+      margin-bottom: 40px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    form, .output, .download-link {
+      width: 100%;
+      margin: 10px auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    form > label, form > input, form > button {
+      margin-bottom: 12px;
+      font-size: 1rem;
+    }
+
+    button {
+      cursor: pointer;
+      padding: 10px 15px;
+      font-weight: 600;
+      background-color: #0078d4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #005a9e;
+    }
+
+    .output p {
+      margin: 8px 0;
+    }
+
+    .download-link {
+      text-align: center;
+      margin-top: 15px;
+      display: inline-block;
+      color: #0078d4;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .download-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- =================== CROP TOOLS =================== -->
+  <div id="crop-tools-section">
+    <h1>MLANGIZI PA PHONE</h1>
+    <p class="subtitle">Satilani ndondomeko ya Ulimi wamakono</p>
+
+    <section>
+      <form id="crop-search-form">
+        <label for="crop-keywords">Search Crops (e.g. maize,cassava)</label>
+        <input type="text" id="crop-keywords" name="keywords" required />
+        <button type="submit">Search</button>
+      </form>
+      <div id="crop-search-results" class="output"></div>
+      <a id="crop-download-link" href="#" class="download-link" style="display:none;" download>Download Crop Summary CSV</a>
+    </section>
+
+    <section style="margin-top: 40px;">
+      <form id="forecast-form">
+        <label for="district-name">Get District Forecast (e.g. karonga)</label>
+        <input type="text" id="district-name" name="district" required />
+        <button type="submit">Get Forecast</button>
+      </form>
+      <div id="forecast-results" class="output"></div>
+    </section>
+
+    <section style="margin-top: 40px;">
+      <button id="generate-calendar-btn">Generate Crop Calendar</button>
+      <div id="calendar-results" class="output"></div>
+      <a id="calendar-download-link" href="#" class="download-link" style="display:none;" download>Download Calendar CSV</a>
+    </section>
+  </div>
+
+  <!-- JavaScript for actions -->
+  <script>
+    const cropDownloadLink = document.getElementById('crop-download-link');
+    const calendarDownloadLink = document.getElementById('calendar-download-link');
+
+    // Show links after generation
+    function showCropDownloadLink(url) {
+      cropDownloadLink.href = url;
+      cropDownloadLink.style.display = 'inline-block';
+    }
+
+    function showCalendarDownloadLink(url) {
+      calendarDownloadLink.href = url;
+      calendarDownloadLink.style.display = 'inline-block';
+    }
+
+    // Handle crop search
+    document.getElementById('crop-search-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const keywords = document.getElementById('crop-keywords').value.trim();
+      if (!keywords) return;
+      const resultsDiv = document.getElementById('crop-search-results');
+      resultsDiv.innerHTML = 'Loading...';
+      cropDownloadLink.style.display = 'none';
+
+      try {
+        const response = await fetch(`search/?keywords=${encodeURIComponent(keywords)}`);
+        const data = await response.json();
+
+        if (data.summary && data.summary.length) {
+          resultsDiv.innerHTML = data.summary.map(s => `<p>${s}</p>`).join('');
+          if (data.note && data.note.includes('Results saved')) {
+            showCropDownloadLink('results/searched_crops_summary.csv');
+          }
+        } else {
+          resultsDiv.innerHTML = `<p>No results found for: ${keywords}</p>`;
+        }
+      } catch (err) {
+        resultsDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+      }
+    });
+
+    // Handle forecast search
+    document.getElementById('forecast-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const district = document.getElementById('district-name').value.trim();
+      if (!district) return;
+      const resultsDiv = document.getElementById('forecast-results');
+      resultsDiv.innerHTML = 'Loading...';
+
+      try {
+        const response = await fetch(`forecast/?district=${encodeURIComponent(district)}`);
+        const data = await response.json();
+
+        if (data.error) {
+          resultsDiv.innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
+        } else if (data.forecast_summary) {
+          const mf = data.forecast_summary.monthly_forecast;
+          const ss = data.forecast_summary.seasonal_summary;
+          let monthlyHtml = '<h3>Monthly Forecast</h3><ul>';
+          for (const month in mf) {
+            monthlyHtml += `<li><strong>${month}:</strong> ${mf[month]}</li>`;
+          }
+          monthlyHtml += '</ul>';
+          let seasonalHtml = '<h3>Seasonal Summary</h3>';
+          seasonalHtml += ss.map(p => `<p>${p}</p>`).join('');
+          resultsDiv.innerHTML = monthlyHtml + seasonalHtml;
+        } else {
+          resultsDiv.innerHTML = '<p>No forecast available.</p>';
+        }
+      } catch (err) {
+        resultsDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+      }
+    });
+
+    // Handle calendar generation
+    document.getElementById('generate-calendar-btn').addEventListener('click', async function() {
+      const resultsDiv = document.getElementById('calendar-results');
+      resultsDiv.innerHTML = 'Generating calendar...';
+      calendarDownloadLink.style.display = 'none';
+
+      try {
+        const response = await fetch('calendar/');
+        const data = await response.json();
+
+        if (data.error) {
+          resultsDiv.innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
+        } else {
+          let html = `<p>${data.message}</p>`;
+          if (data.calendar_preview && data.calendar_preview.length > 0) {
+            data.calendar_preview.forEach(row => {
+              html += '<p>' + Object.entries(row).map(([k,v]) => `${k}: ${v}`).join(', ') + '</p>';
+            });
+          }
+          resultsDiv.innerHTML = html;
+          if (data.saved_to) {
+            showCalendarDownloadLink(data.saved_to);
+          }
+        }
+      } catch (err) {
+        resultsDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>

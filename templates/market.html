@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Market Locator - MLANGIZI PA PHONE</title>
+  <style>
+    body, html {
+      height: 100%; margin: 0;
+      font-family: Arial, sans-serif; color: white;
+      background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+        url('/static/images/image3.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+    .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto;
+      background-color: rgba(0,0,0,0.4); padding-top: 60px; }
+    .modal-content {
+      background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888;
+      width: 80%; max-height: 80%; overflow-y: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); color: black;
+      border-radius: 8px;
+      position: relative;
+    }
+    .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+    .close:hover, .close:focus { color: black; text-decoration: none; }
+    .navbar { display: flex; justify-content: center; background-color: rgba(0, 0, 0, 0.6);
+      padding: 12px 0; position: fixed; top: 0; width: 100%; z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.7); }
+    .nav-tab {
+      margin: 0 8px; padding: 6px 12px; cursor: pointer;
+      background-color: rgba(255, 255, 255, 0.15); border-radius: 5px;
+      font-weight: bold; color: white; text-transform: uppercase; font-size: 0.85rem;
+      user-select: none;
+    }
+    .nav-tab:hover { background-color: rgba(255, 255, 255, 0.35); }
+    .button {
+      background-color: #4CAF50; color: white; padding: 10px 20px; margin: 5px 0;
+      border: none; cursor: pointer; border-radius: 5px; display: block; width: 100%;
+      text-align: left;
+      font-size: 1rem;
+    }
+    .button:hover { background-color: #45a049; }
+    /* Ensure vertical stacking with spacing */
+    #marketList, #productMarketList {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    /* WhatsApp icon style */
+    .whatsapp-button {
+      display: inline-flex;
+      align-items: center;
+      background-color: #25D366;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      margin-top: 15px;
+    }
+    .whatsapp-button svg {
+      margin-right: 8px;
+      height: 24px;
+      width: 24px;
+      fill: white;
+    }
+    .contact-info {
+      margin-top: 15px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-tab" onclick="openMarketModal()">Find Market</div>
+    <div class="nav-tab" onclick="alert('hello')">Ask</div>
+    <div class="nav-tab" onclick="openRegisterModal()">Register</div>
+    <div class="nav-tab" onclick="openProductMarketModal()">malonda</div>
+    <div class="nav-tab" onclick="alert('hello')">Your Orders</div>
+  </nav>
+
+  <!-- Modals -->
+  <div id="marketModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('marketModal')">&times;</span>
+      <h2>Available Tools/Materials Businesses</h2>
+      <div id="marketList"></div>
+    </div>
+  </div>
+
+  <div id="productMarketModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('productMarketModal')">&times;</span>
+      <h2>Available Product Businesses</h2>
+      <div id="productMarketList"></div>
+    </div>
+  </div>
+
+  <div id="businessModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('businessModal')">&times;</span>
+      <h2>Choose Business Type</h2>
+      <button onclick="openWebsiteModal('tools')">Tools/Materials Business</button>
+      <button onclick="openWebsiteModal('products')">Product Business</button>
+    </div>
+  </div>
+
+  <div id="websiteModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('websiteModal')">&times;</span>
+      <h2>Does the business have a website?</h2>
+      <button onclick="openDetailsModal(true)">With Website</button>
+      <button onclick="openNoWebsiteModal()">Without Website</button>
+    </div>
+  </div>
+
+  <div id="detailsModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('detailsModal')">&times;</span>
+      <h2>Enter Business Details</h2>
+      <form id="businessForm">
+        <input type="text" id="business_name" placeholder="Business Name" required><br><br>
+        <input type="text" id="status" placeholder="Status" required><br><br>
+        <input type="text" id="website" placeholder="Website URL" required><br><br>
+        <input type="hidden" id="business_type" value="tools" />
+        <button type="submit" class="button">Save Business</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="noWebsiteModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('noWebsiteModal')">&times;</span>
+      <h2>Welcome</h2>
+      <p>
+        If you don't have a website page or want to register without a website, contact Syton Mphaka through:
+      </p>
+      <p>
+        Ngati mkufuna kulembetsa koma mulibe website, muyankhuleni/muuzeni Syton Mphaka kudzera pa:
+      </p>
+      <div class="contact-info">
+        Phone: 0881395799, 0990396900<br>
+        Email: sytonmphaka12345@gmail.com, mec-020-21@must.ac.mw
+      </div>
+      <a
+        href="https://wa.me/265881395799?text=Hello%20Syton,%20I%20want%20to%20register%20my%20business%20without%20a%20website."
+        target="_blank"
+        rel="noopener noreferrer"
+        class="whatsapp-button"
+      >
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+          <path d="M20.52 3.48A11.923 11.923 0 0012 0C5.37 0 0 5.37 0 12a11.83 11.83 0 001.64 6.04L0 24l6.04-1.64A11.88 11.88 0 0012 24c6.63 0 12-5.37 12-12 0-3.2-1.24-6.2-3.48-8.52zm-8.52 16.06a7.3 7.3 0 01-3.89-1.11l-.28-.17-3.4.92.91-3.31-.18-.29a7.35 7.35 0 011.1-9.6 7.23 7.23 0 015.1-2.1 7.3 7.3 0 017.28 7.3 7.27 7.27 0 01-2.1 5.1 7.33 7.33 0 01-5.53 2.06zm3.45-4.52c-.19-.09-1.11-.54-1.28-.6-.17-.06-.3-.09-.43.09s-.5.6-.61.73-.22.13-.41.05a4.4 4.4 0 01-1.3-.76 5.06 5.06 0 01-1.85-2.27c-.18-.31 0-.48.13-.59.13-.12.29-.3.43-.44.14-.15.19-.26.28-.43a.67.67 0 000-.43c-.06-.17-.43-1.04-.59-1.43-.15-.38-.3-.33-.43-.34-.12 0-.26 0-.4 0a.86.86 0 00-.62.29 2.67 2.67 0 00-.82 1.94 4.05 4.05 0 002.39 3.9 4.56 4.56 0 002.24.7 1.47 1.47 0 001.01-.42 1.15 1.15 0 00.33-.82c0-.14-.05-.24-.19-.33z"/>
+        </svg>
+        WhatsApp Syton
+      </a>
+    </div>
+  </div>
+
+  <div style="padding-top: 70px; text-align: center;">
+    <h1>Welcome to Market Locator</h1>
+    <p>Use the tabs above to navigate.</p>
+  </div>
+
+  <script>
+    let selectedType = "tools";
+
+    function openRegisterModal() {
+      document.getElementById("businessModal").style.display = "block";
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = "none";
+    }
+
+    function openWebsiteModal(type) {
+      selectedType = type;
+      document.getElementById("business_type").value = type;
+      document.getElementById("websiteModal").style.display = "block";
+      closeModal('businessModal');
+    }
+
+    function openDetailsModal() {
+      document.getElementById("detailsModal").style.display = "block";
+      closeModal('websiteModal');
+    }
+
+    function openNoWebsiteModal() {
+      document.getElementById("noWebsiteModal").style.display = "block";
+      closeModal('websiteModal');
+    }
+
+    document.getElementById("businessForm").onsubmit = function(event) {
+      event.preventDefault();
+
+      const name = document.getElementById("business_name").value;
+      const status = document.getElementById("status").value;
+      const website = document.getElementById("website").value;
+      const type = document.getElementById("business_type").value;
+
+      const endpoint = type === 'tools' ? '/register_business' : '/register_product';
+
+      fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ business_name: name, status, website })
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message);
+        closeModal('detailsModal');
+        // Clear form after submit
+        document.getElementById("businessForm").reset();
+      })
+      .catch(e => alert("Error saving business: " + e));
+    };
+
+    function openMarketModal() {
+      fetch('/businesses')
+        .then(res => res.json())
+        .then(data => {
+          const list = document.getElementById("marketList");
+          list.innerHTML = "";
+          data.businesses.forEach(b => {
+            const btn = document.createElement("button");
+            btn.className = "button";
+            btn.innerText = `${b.name} (${b.status})`;
+            btn.onclick = () => window.open(b.website, "_blank");
+            list.appendChild(btn);
+          });
+          document.getElementById("marketModal").style.display = "block";
+        })
+        .catch(e => alert("Error fetching businesses: " + e));
+    }
+
+    function openProductMarketModal() {
+      fetch('/products')  /* Ensure this matches your FastAPI endpoint */
+        .then(res => res.json())
+        .then(data => {
+          const list = document.getElementById("productMarketList");
+          list.innerHTML = "";
+          data.products.forEach(b => {
+            const btn = document.createElement("button");
+            btn.className = "button";
+            btn.innerText = `${b.name} (${b.status})`;
+            btn.onclick = () => window.open(b.website, "_blank");
+            list.appendChild(btn);
+          });
+          document.getElementById("productMarketModal").style.display = "block";
+        })
+        .catch(e => alert("Error fetching product businesses: " + e));
+    }
+  </script>
+</body>
+</html>

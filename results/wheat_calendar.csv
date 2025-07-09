@@ -1,0 +1,7 @@
+Month,Expected Rainfall (mm),Dry Spell Detected,Irrigation Needed,Recommended Action,Activity
+December 2024,250,False,No,Rainfed OK,Growth phase
+January 2025,350,False,No,Rainfed OK,Growth phase
+February 2025,200,False,Yes,Irrigate weekly,Growth phase
+March 2025,150,False,Yes,Irrigate weekly,Growth phase
+April 2025,80,False,Yes,Irrigate weekly,Growth phase
+May 2025,0,True,Yes,Irrigate weekly,Growth phase

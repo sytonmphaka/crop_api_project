@@ -1,0 +1,2 @@
+COMNAME,LISPA,TOPMN,TOPMX,TMIN,TMAX,ROPMN,ROPMX,RMIN,RMAX,PHOPMN,PHOPMX,PHMIN,PHMAX,ALTMX,LIOPMN,LIOPMX,LIMN,LIMX,DEP,DEPR,TEXT,TEXTR,FER,FERR,SAL,SALR,DRA,DRAR,CLIZ,GMIN,GMAX
+watermelon,annual,20.0,35.0,15.0,40.0,500.0,700.0,400.0,1800.0,6.0,7.0,5.5,7.5,1000.0,clear skies,very bright,cloudy skies,very bright,deep (>>150 cm),medium (50-150 cm),medium,light,high,low,low (<4 dS/m),medium (4-10 dS/m),well (dry spells),excessive (dry/moderately dry),"tropical wet & dry (Aw), tropical wet (Ar), subtropical humid (Cf), subtropical dry summer (Cs), temperate oceanic (Do)",0.0,0.0

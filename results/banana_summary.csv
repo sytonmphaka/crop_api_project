@@ -1,0 +1,3 @@
+COMNAME,LISPA,TOPMN,TOPMX,TMIN,TMAX,ROPMN,ROPMX,RMIN,RMAX,PHOPMN,PHOPMX,PHMIN,PHMAX,ALTMX,LIOPMN,LIOPMX,LIMN,LIMX,DEP,DEPR,TEXT,TEXTR,FER,FERR,SAL,SALR,DRA,DRAR,CLIZ,GMIN,GMAX
+banana,perennial,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0.0,0.0
+banana,perennial,22.0,32.0,13.0,38.0,2400.0,2700.0,2000.0,3500.0,5.0,7.0,4.5,7.5,2400.0,very bright,very bright,cloudy skies,very bright,deep (>>150 cm),medium (50-150 cm),"medium, organic","medium, organic",high,moderate,low (<4 dS/m),low (<4 dS/m),well (dry spells),well (dry spells),"tropical wet & dry (Aw), tropical wet (Ar)",0.0,0.0
