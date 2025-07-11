@@ -1,0 +1,35 @@
+<!-- templates/other.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ name }} - Business Page</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+
+    .header {
+      background-color: #333;
+      color: white;
+      padding: 15px;
+      font-size: 1.1rem;
+    }
+
+    iframe {
+      width: 100%;
+      height: calc(100% - 60px);
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    Viewing {{ name }}
+  </div>
+  <iframe src="{{ url }}"></iframe>
+</body>
+</html>

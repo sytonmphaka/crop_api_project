@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from supa import load_supabase_client, delete_file_metadata
 
 from eco_crop_routes import router as eco_router
 from upload_routes import router as upload_router
@@ -346,7 +347,17 @@ async def upload_file(name: str, file: UploadFile = File(...), view: str = Form(
 
 
 
+@app.post("/delete/{name}/{file_id}")
+async def delete_file(name: str, file_id: int, request: Request):
+    supabase = load_supabase_client(name)
+    if not supabase:
+        return {"error": "Supabase client not found."}
 
+    try:
+        delete_file_metadata(supabase, file_id)
+        return RedirectResponse(url=f"/profile/{name}", status_code=303)
+    except Exception as e:
+        return {"error": f"Failed to delete file: {str(e)}"}
 
 
 
@@ -374,3 +385,21 @@ async def profile(request: Request, name: str):
         "files": files
     })
 
+
+
+
+
+
+
+
+
+
+
+@app.get("/other", response_class=HTMLResponse)
+async def read_other(request: Request, url: str, name: str = "Business", status: str = "Unknown"):
+    return templates.TemplateResponse("other.html", {
+        "request": request,
+        "url": url,
+        "name": name,
+        "status": status
+    })

@@ -340,7 +340,13 @@
               const btn = document.createElement("button");
               btn.className = "button";
               btn.innerText = `${b.name} (${b.status})`;
-              btn.onclick = () => window.open(b.website, "_blank");
+              btn.onclick = () => {
+  const url = encodeURIComponent(b.website);
+  const name = encodeURIComponent(b.name);
+  const status = encodeURIComponent(b.status);
+  window.location.href = `/other?url=${url}&name=${name}&status=${status}`;
+};
+
               list.appendChild(btn);
             });
           } else {
@@ -362,7 +368,14 @@
               const btn = document.createElement("button");
               btn.className = "button";
               btn.innerText = `${b.name} (${b.status})`;
-              btn.onclick = () => window.open(b.website, "_blank");
+              btn.onclick = () => {
+  const url = encodeURIComponent(b.website);
+  const name = encodeURIComponent(b.name);
+  const status = encodeURIComponent(b.status);
+  window.location.href = `/other?url=${url}&name=${name}&status=${status}`;
+};
+
+
               list.appendChild(btn);
             });
           } else {
