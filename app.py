@@ -305,7 +305,7 @@ async def profile(request: Request, name: str):
 import uuid
 
 @app.post("/upload/{name}")
-async def upload_file(name: str, file: UploadFile = File(...)):
+async def upload_file(name: str, file: UploadFile = File(...), view: str = Form("profile")):
     supabase = load_supabase_client(name)
     if not supabase:
         return {"error": "Supabase client not found for this user."}
@@ -315,24 +315,27 @@ async def upload_file(name: str, file: UploadFile = File(...)):
     unique_name = f"{uuid.uuid4()}.{file_ext}"
 
     try:
-        # Upload to Supabase Storage (bucket name must be 'uploads')
+        # Upload file
         supabase.storage.from_("uploads").upload(
             unique_name,
             contents,
             {"content-type": file.content_type}
         )
 
-        # Get public URL
         public_url = supabase.storage.from_("uploads").get_public_url(unique_name)
 
-        # Save file metadata in the 'data' table
+        # Save metadata
         supabase.table("data").insert({
             "name": name,
             "filename": file.filename,
             "file_url": public_url
         }).execute()
 
-        return RedirectResponse(url=f"/profile/{name}", status_code=303)
+        # Redirect depending on who sent the upload
+        if view == "user":
+            return RedirectResponse(url=f"/user/{name}", status_code=303)
+        else:
+            return RedirectResponse(url=f"/profile/{name}", status_code=303)
 
     except Exception as e:
         print("Upload error:", e)
@@ -349,13 +352,25 @@ async def upload_file(name: str, file: UploadFile = File(...)):
 
 
 
-@app.post("/delete/{name}/{file_id}")
-async def delete_file(name: str, file_id: int):
+
+
+
+
+
+
+@app.get("/user/{name}", response_class=HTMLResponse)
+async def profile(request: Request, name: str):
+    credentials = load_credentials()
+    user = credentials.get(name)
+    if not user:
+        return HTMLResponse(f"<h3>Business '{name}' not found. Please register or login.</h3>")
+
     supabase = load_supabase_client(name)
-    if not supabase:
-        return {"error": "Supabase client not found for this user."}
+    files = list_uploaded_files(supabase, name) if supabase else []
 
-    # Delete from the table
-    supabase.table("data").delete().eq("id", file_id).execute()
+    return templates.TemplateResponse("user.html", {
+        "request": request,
+        "user": {**user, "name": name},
+        "files": files
+    })
 
-    return RedirectResponse(url=f"/profile/{name}", status_code=303)
